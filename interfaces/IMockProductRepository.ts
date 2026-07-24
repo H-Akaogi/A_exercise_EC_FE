@@ -4,20 +4,19 @@ import { Product } from "../models/Product";
  * 商品リポジトリインターフェース
  */
 export interface IMockProductRepository {
-    /**
-     * 指定したキーワードで商品を検索して取得する
-     * @param keyword 検索キーワード
-     * @returns 検索にヒットした商品のリスト（非同期）
-     */
-    searchKeyword(keyword: string): Promise<Product[]>;
-
-    updateProduct(
-        productUuid: string,
-        name: string,
-        price: number
-    ): Promise<Product | null>;
 
     findAll(): Promise<Product[]>
+
+    /**
+    * 商品UUIDを指定して商品を1件取得する
+    *
+    * @param productUuid 商品UUID
+    * @returns 該当する商品。存在しない場合はnull
+    */
+    findById(
+        productUuid: string,
+    ): Promise<Product | null>;
+
 
     /**
      * 購入された分だけ商品の在庫を減らす関数

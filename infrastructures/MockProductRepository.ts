@@ -62,81 +62,31 @@ export class MockProductRepository
     ];
 
     /**
-     * 指定したキーワードで商品を検索する
-     *
-     * @param keyword 検索キーワード
-     * @returns 検索結果
-     */
-    public async searchKeyword(
-        keyword: string,
-    ): Promise<Product[]> {
-        /*
-         * キーワードが空の場合は全件返す。
-         */
-        if (!keyword.trim()) {
-            return [...this.mockProducts];
-        }
-
-        const filteredProducts =
-            this.mockProducts.filter(
-                (product) =>
-                    product.name.includes(
-                        keyword,
-                    ),
-            );
-
-        return filteredProducts;
-    }
-
-    /**
-     * 商品名と価格を更新する
-     *
-     * @param productUuid 商品UUID
-     * @param name 更新後の商品名
-     * @param price 更新後の価格
-     * @returns 更新後の商品。対象が存在しない場合はnull
-     */
-    public async updateProduct(
-        productUuid: string,
-        name: string,
-        price: number,
-    ): Promise<Product | null> {
-        const targetProduct =
-            this.mockProducts.find(
-                (product) =>
-                    product.productUuid
-                    === productUuid,
-            );
-
-        if (!targetProduct) {
-            return null;
-        }
-
-        const updatedProduct: Product = {
-            ...targetProduct,
-            name,
-            price,
-        };
-
-        this.mockProducts =
-            this.mockProducts.map(
-                (product) =>
-                    product.productUuid
-                        === productUuid
-                        ? updatedProduct
-                        : product,
-            );
-
-        return updatedProduct;
-    }
-
-    /**
      * 商品を全件取得する
      *
      * @returns 商品一覧
      */
     public async findAll(): Promise<Product[]> {
         return [...this.mockProducts];
+    }
+
+    /**
+ * 商品UUIDを指定して商品を1件取得する
+ *
+ * @param productUuid 商品UUID
+ * @returns 該当する商品。存在しない場合はnull
+ */
+    public async findById(
+        productUuid: string,
+    ): Promise<Product | null> {
+        const product =
+            this.mockProducts.find(
+                (mockProduct) =>
+                    mockProduct.productUuid
+                    === productUuid,
+            );
+
+        return product ?? null;
     }
 
     /**
