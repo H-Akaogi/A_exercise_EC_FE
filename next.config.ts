@@ -31,6 +31,15 @@ const nextConfig: NextConfig = {
         destination:
           `${apiBaseUrl}/account/:path*`,
       },
+      {
+        /**
+         * 商品一覧API
+         */
+        source:
+          "/proxy-api/products/:path*",
+        destination:
+          `${apiBaseUrl}/products/:path*`,
+      },
     ];
   },
 };

@@ -17,68 +17,157 @@ export const Header = () => {
 
     return (
         <header className="
-            flex
-            items-center
-            justify-between
+            sticky
+            top-0
+            z-50
             border-b
-            bg-white
-            px-8
-            py-4
+            border-green-200
+            bg-green-50
         ">
-            <button
-                type="button"
-                className="text-xl font-bold"
-                onClick={() => {
-                    router.push(
-                        "/products",
-                    );
-                }}
-            >
-                商品販売サイト
-            </button>
-
-            <Button
-                type="button"
-                variant="outline"
-                className="
-                    relative
-                    flex
-                    items-center
-                    gap-2
-                "
-                onClick={() => {
-                    router.push(
-                        "/cart",
-                    );
-                }}
-            >
-                <ShoppingCart size={22} />
-
-                <span>
-                    かご
-                </span>
-
-                {totalQuantity > 0 && (
+            <div className="
+                mx-auto
+                flex
+                max-w-6xl
+                items-center
+                justify-between
+                px-6
+                py-3
+            ">
+                {/* ロゴ・サイト名 */}
+                <button
+                    type="button"
+                    className="
+                        flex
+                        items-center
+                        gap-2
+                        font-bold
+                        text-green-700
+                    "
+                    onClick={() => {
+                        router.push("/");
+                    }}
+                >
                     <span className="
-                        absolute
-                        -right-2
-                        -top-2
                         flex
                         h-6
-                        min-w-6
+                        w-6
                         items-center
                         justify-center
-                        rounded-full
-                        bg-red-600
-                        px-1
-                        text-xs
-                        font-bold
+                        rounded
+                        bg-green-700
+                        text-sm
                         text-white
                     ">
-                        {totalQuantity}
+                        ✓
                     </span>
-                )}
-            </Button>
+
+                    <span>
+                        フルネス文具
+                    </span>
+                </button>
+
+                {/* ナビゲーション */}
+                <nav className="
+                    flex
+                    items-center
+                    gap-5
+                    text-sm
+                ">
+                    <button
+                        type="button"
+                        className="
+                            text-green-700
+                            hover:underline
+                        "
+                        onClick={() => {
+                            router.push(
+                                "/products",
+                            );
+                        }}
+                    >
+                        商品検索
+                    </button>
+
+                    <button
+                        type="button"
+                        className="
+                            text-gray-600
+                            hover:underline
+                        "
+                        onClick={() => {
+                            router.push(
+                                "/account/register",
+                            );
+                        }}
+                    >
+                        アカウント登録
+                    </button>
+
+                    <button
+                        type="button"
+                        className="
+                            text-gray-600
+                            hover:underline
+                        "
+                        onClick={() => {
+                            router.push(
+                                "/login",
+                            );
+                        }}
+                    >
+                        ログイン
+                    </button>
+
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        className="
+                            relative
+                            flex
+                            items-center
+                            gap-1
+                        "
+                        onClick={() => {
+                            router.push(
+                                "/cart",
+                            );
+                        }}
+                    >
+                        <ShoppingCart
+                            className="
+                                h-5
+                                w-5
+                                text-orange-500
+                            "
+                        />
+
+                        <span>
+                            かご
+                        </span>
+
+                        {totalQuantity > 0 && (
+                            <span className="
+                                absolute
+                                -right-2
+                                -top-2
+                                flex
+                                h-5
+                                min-w-5
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-red-600
+                                px-1
+                                text-xs
+                                font-bold
+                                text-white
+                            ">
+                                {totalQuantity}
+                            </span>
+                        )}
+                    </Button>
+                </nav>
+            </div>
         </header>
     );
 };
