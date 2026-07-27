@@ -81,7 +81,7 @@ export const Header = () => {
                         "
                         onClick={() => {
                             router.push(
-                                "/products",
+                                "/products/search",
                             );
                         }}
                     >
@@ -129,7 +129,7 @@ export const Header = () => {
                         "
                         onClick={() => {
                             router.push(
-                                "/cart",
+                                "/purchase",
                             );
                         }}
                     >

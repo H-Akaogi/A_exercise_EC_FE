@@ -375,7 +375,7 @@ export const TopPage = () => {
                             "
                             onClick={() => {
                                 router.push(
-                                    "/products",
+                                    "/products/search",
                                 );
                             }}
                         >

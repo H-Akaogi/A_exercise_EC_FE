@@ -16,9 +16,10 @@ export interface IPurchaseProductService {
     ): Promise<Product | null>;
 
     purchase(
+        paymentMethodId: number,
         items: {
             productUuid: string;
             quantity: number;
-        }[]
-    ): Promise<void>;
+        }[],
+    ): Promise<void>
 }

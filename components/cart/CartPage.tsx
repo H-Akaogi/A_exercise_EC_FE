@@ -3,6 +3,7 @@
 import {
     useMemo,
     useState,
+    useEffect,
 } from "react";
 import { useRouter } from "next/navigation";
 
@@ -10,6 +11,9 @@ import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
 
 import type { IPurchaseProductService } from "@/interfaces/IPurchaseProductService";
+import {
+    usePaymentMethod,
+} from "@/components/hooks/usePaymentMethod";
 
 import { useCart } from "@/contexts/CartContext";
 
@@ -37,6 +41,21 @@ import {
 
 export const CartPage = () => {
     const router = useRouter();
+
+    const {
+        paymentMethods,
+        isLoading:
+        isPaymentMethodLoading,
+        errorMessage:
+        paymentMethodErrorMessage,
+        findAll:
+        findAllPaymentMethods,
+    } = usePaymentMethod();
+
+    const [
+        paymentMethodId,
+        setPaymentMethodId,
+    ] = useState<number>(0);
 
     const {
         cartItems,
@@ -77,13 +96,21 @@ export const CartPage = () => {
     ] = useState<string>("");
 
     /**
-     * 購入を確定する
-     */
+ * 購入を確定する
+ */
     const confirmPurchase =
         async (): Promise<void> => {
             if (cartItems.length === 0) {
                 setErrorMessage(
                     "かごに商品がありません",
+                );
+
+                return;
+            }
+
+            if (paymentMethodId <= 0) {
+                setErrorMessage(
+                    "支払い方法を選択してください",
                 );
 
                 return;
@@ -95,6 +122,7 @@ export const CartPage = () => {
 
             try {
                 await purchaseService.purchase(
+                    paymentMethodId,
                     cartItems.map(
                         (item) => ({
                             productUuid:
@@ -106,10 +134,9 @@ export const CartPage = () => {
                     ),
                 );
 
-                /*
-                 * 購入成功後にかごを空にする。
-                 */
                 clearCart();
+
+                setPaymentMethodId(0);
 
                 setIsConfirmOpen(false);
 
@@ -133,6 +160,12 @@ export const CartPage = () => {
                 setIsLoading(false);
             }
         };
+
+    useEffect(() => {
+        void findAllPaymentMethods();
+    }, [
+        findAllPaymentMethods,
+    ]);
 
     return (
         <div className="
@@ -184,7 +217,7 @@ export const CartPage = () => {
                         type="button"
                         onClick={() => {
                             router.push(
-                                "/products",
+                                "/products/search",
                             );
                         }}
                     >
@@ -333,6 +366,77 @@ export const CartPage = () => {
                                 .toLocaleString()}
                             円
                         </p>
+                        <div className="
+    ml-auto
+    w-full
+    max-w-sm
+">
+                            <label
+                                htmlFor="paymentMethod"
+                                className="
+            mb-2
+            block
+            text-sm
+            font-bold
+            text-gray-700
+        "
+                            >
+                                支払い方法
+                            </label>
+
+                            <select
+                                id="paymentMethod"
+                                value={paymentMethodId}
+                                disabled={
+                                    isLoading
+                                    || isPaymentMethodLoading
+                                }
+                                onChange={(event) => {
+                                    setPaymentMethodId(
+                                        Number(
+                                            event.target.value,
+                                        ),
+                                    );
+
+                                    setErrorMessage("");
+                                }}
+                                className="
+            h-10
+            w-full
+            rounded-md
+            border
+            border-gray-300
+            bg-white
+            px-3
+            text-sm
+            outline-none
+            focus:border-green-700
+            focus:ring-2
+            focus:ring-green-200
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+        "
+                            >
+                                <option value={0}>
+                                    支払い方法を選択してください
+                                </option>
+
+                                {paymentMethods.map(
+                                    (paymentMethod) => (
+                                        <option
+                                            key={
+                                                paymentMethod.id
+                                            }
+                                            value={
+                                                paymentMethod.id
+                                            }
+                                        >
+                                            {paymentMethod.name}
+                                        </option>
+                                    ),
+                                )}
+                            </select>
+                        </div>
 
                         <div className="flex gap-4">
                             <Button

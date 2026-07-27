@@ -89,7 +89,7 @@ export const ProductDetail = () => {
                     className="mt-4"
                     onClick={() => {
                         router.push(
-                            "/products",
+                            "/products/search",
                         );
                     }}
                 >
@@ -330,7 +330,7 @@ export const ProductDetail = () => {
                     className="w-full"
                     onClick={() => {
                         router.push(
-                            "/cart",
+                            "/purchase",
                         );
                     }}
                 >
@@ -343,7 +343,7 @@ export const ProductDetail = () => {
                     className="w-full"
                     onClick={() => {
                         router.push(
-                            "/products",
+                            "/products/search",
                         );
                     }}
                 >
