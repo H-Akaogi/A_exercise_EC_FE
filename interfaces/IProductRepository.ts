@@ -3,9 +3,19 @@ import { Product } from "../models/Product";
  * 演習 6-2 データアクセスとサービスを実装する
  * 商品リポジトリインターフェース
  */
-export interface IMockProductRepository {
+export interface IProductRepository {
 
-    findAll(): Promise<Product[]>
+    /**
+   * 商品を検索する
+   *
+   * カテゴリUUIDが未指定の場合は全件取得する。
+   *
+   * @param productCategoryUuid 商品カテゴリUUID
+   * @returns 商品一覧
+   */
+    findByCategory(
+        productCategoryUuid?: string,
+    ): Promise<Product[]>;
 
     /**
     * 商品UUIDを指定して商品を1件取得する
@@ -24,8 +34,11 @@ export interface IMockProductRepository {
      * @param quantity 商品の在庫数
      * @returns 在庫変更後の商品情報
      */
-    purchaseProduct(
-        productUuid: string,
-        quantity: number
-    ): Promise<Product | null>;
+    purchase(
+        paymentMethodId: number,
+        items: {
+            productUuid: string;
+            quantity: number;
+        }[],
+    ): Promise<void>;
 }

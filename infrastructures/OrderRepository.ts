@@ -251,7 +251,8 @@ export class OrderRepository
             (await response.json()) as {
                 orderUuid: string;
                 orderDate: string;
-                orderStatus: string;
+                orderStatusId: number;
+                orderStatusName: string;
                 orderItems: {
                     productUuid: string;
                     productName: string;
@@ -276,14 +277,10 @@ export class OrderRepository
                 responseData.totalPrice,
 
             orderStatus: {
-                /*
-                 * APIから注文ステータスUUIDは返らないため、
-                 * 空文字を設定する。
-                 */
-                orderStatusUuid: "",
+                id: responseData.orderStatusId,
 
                 name:
-                    responseData.orderStatus,
+                    responseData.orderStatusName,
             },
 
             ordersDetails:

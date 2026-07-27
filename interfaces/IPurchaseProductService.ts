@@ -1,7 +1,9 @@
 import { Product } from "@/models/Product";
 
 export interface IPurchaseProductService {
-    findall(): Promise<Product[]>;
+    findByCategory(
+        productCategoryUuid?: string,
+    ): Promise<Product[]>;
 
     /**
  * 商品UUIDから商品を1件取得する

@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
 
+// const apiBaseUrl =
+//   process.env.API_BASE_URL ??
+//   "http://74.176.217.130";
+
 const apiBaseUrl =
   process.env.API_BASE_URL ??
-  "http://74.176.217.130";
+  "http://localhost:5100";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -36,9 +40,9 @@ const nextConfig: NextConfig = {
          * 商品一覧API
          */
         source:
-          "/proxy-api/products/:path*",
+          "/proxy-api/product/:path*",
         destination:
-          `${apiBaseUrl}/products/:path*`,
+          `${apiBaseUrl}/product/:path*`,
       },
       {
         /**
@@ -48,6 +52,24 @@ const nextConfig: NextConfig = {
           "/proxy-api/purchase/history/:path*",
         destination:
           `${apiBaseUrl}/purchase/history/:path*`,
+      },
+      {
+        /**
+         * カテゴリ一覧API
+         */
+        source:
+          "/proxy-api/product-category/options",
+        destination:
+          `${apiBaseUrl}/product-category/options`,
+      },
+      {
+        /**
+         * 支払方法一覧API
+         */
+        source:
+          "/proxy-api/payment-method/options",
+        destination:
+          `${apiBaseUrl}/payment-method/options`,
       },
     ];
   },

@@ -56,6 +56,16 @@ export const usePurchaseProduct = () => {
     ] = useState<boolean>(false);
 
     /**
+     * 現在選択されているカテゴリUUID
+     *
+     * 空文字の場合は全カテゴリ。
+     */
+    const [
+        selectedCategoryUuid,
+        setSelectedCategoryUuid,
+    ] = useState<string>("");
+
+    /**
      * エラーメッセージ
      */
     const [
@@ -64,17 +74,30 @@ export const usePurchaseProduct = () => {
     ] = useState<string>("");
 
     /**
-     * 商品一覧を取得する
+     * カテゴリを指定して商品を取得する
+     *
+     * categoryUuidが空文字の場合は全件取得する。
+     *
+     * @param categoryUuid 商品カテゴリUUID
      */
-    const findAll =
+    const findByCategory =
         useCallback(
-            async (): Promise<void> => {
+            async (
+                categoryUuid: string = "",
+            ): Promise<void> => {
                 setIsLoading(true);
                 setErrorMessage("");
+                setSelectedCategoryUuid(
+                    categoryUuid,
+                );
 
                 try {
                     const result =
-                        await purchaseService.findall();
+                        await purchaseService
+                            .findByCategory(
+                                categoryUuid
+                                || undefined,
+                            );
 
                     setProducts(result);
                 } catch (error) {
@@ -86,13 +109,26 @@ export const usePurchaseProduct = () => {
                     setProducts([]);
 
                     setErrorMessage(
-                        "商品一覧の取得に失敗しました",
+                        error instanceof Error
+                            ? error.message
+                            : "商品一覧の取得に失敗しました",
                     );
                 } finally {
                     setIsLoading(false);
                 }
             },
             [purchaseService],
+        );
+
+    /**
+     * 商品を全件取得する
+     */
+    const findAll =
+        useCallback(
+            async (): Promise<void> => {
+                await findByCategory("");
+            },
+            [findByCategory],
         );
 
     /**
@@ -157,11 +193,13 @@ export const usePurchaseProduct = () => {
     return {
         products,
         selectedProduct,
+        selectedCategoryUuid,
         isLoading,
         errorMessage,
 
         findAll,
         findById,
+        findByCategory,
         clearSelectedProduct,
     };
 };

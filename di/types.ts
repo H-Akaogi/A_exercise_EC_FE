@@ -4,7 +4,9 @@
 */
 export const TYPES = {
     // インフラストラクチャ層
-    IMockProductRepository: Symbol.for("IMockProductRepository"),
+    IProductRepository: Symbol.for("IProductRepository"),
+    IProductCategoryRepository: Symbol.for("IProductCategoryRepository"),
     // サービス(ユースケース)層
     IPurchaseProductService: Symbol.for("IPurchaseProductService"),
+    IProductCategoryService: Symbol.for("IProductCategoryService"),
 };

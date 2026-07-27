@@ -2,8 +2,12 @@ import { IPurchaseProductService } from "@/interfaces/IPurchaseProductService";
 import { Container } from "inversify";
 import { TYPES } from "./types";
 import { PurchaseProductService } from "@/services/PurchaseProductService";
-import { MockProductRepository } from "@/infrastructures/MockProductRepository";
-import { IMockProductRepository } from "@/interfaces/IMockProductRepository";
+import { ProductRepository } from "@/infrastructures/ProductRepository";
+import { IProductRepository } from "@/interfaces/IProductRepository";
+import { ProductCategoryRepository } from "@/infrastructures/ProductCategoryRepository";
+import { IProductCategoryRepository } from "@/interfaces/IProductCategoryRepository";
+import { IProductCategoryService } from "@/interfaces/IProductCategoryService";
+import { ProductCategoryService } from "@/services/ProductCategoryService";
 
 /**
  * 演習 6-2 データアクセスとサービスを実装する
@@ -13,10 +17,12 @@ const container = new Container();
 // ---------------------------------------------------------
 // バインディング（登録）設定
 // ---------------------------------------------------------
-// リポジトリの登録(モック版を紐付ける)
-container.bind<IMockProductRepository>(TYPES.IMockProductRepository).to(MockProductRepository).inSingletonScope();
-// サービス(ユースケース)の登録
+// リポジトリの登録(モック版を紐付
+container.bind<IProductRepository>(TYPES.IProductRepository).to(ProductRepository).inSingletonScope();
+container.bind<IProductCategoryRepository>(TYPES.IProductCategoryRepository).to(ProductCategoryRepository).inSingletonScope();
+// サービス(ユースケース)の
 container.bind<IPurchaseProductService>(TYPES.IPurchaseProductService).to(PurchaseProductService);
+container.bind<IProductCategoryService>(TYPES.IProductCategoryService).to(ProductCategoryService);
 
 
 export { container };

@@ -1,18 +1,18 @@
 import { inject, injectable } from "inversify";
 import { TYPES } from "@/di/types";
-import type { IMockProductRepository } from "@/interfaces/IMockProductRepository";
+import type { IProductRepository } from "@/interfaces/IProductRepository";
 import type { IPurchaseProductService } from "@/interfaces/IPurchaseProductService";
 import type { Product } from "@/models/Product";
 
 @injectable()
 export class PurchaseProductService implements IPurchaseProductService {
     constructor(
-        @inject(TYPES.IMockProductRepository)
-        private productRepository: IMockProductRepository
+        @inject(TYPES.IProductRepository)
+        private productRepository: IProductRepository
     ) { }
 
-    public async findall(): Promise<Product[]> {
-        return await this.productRepository.findAll();
+    public async findByCategory(productCategoryUuid?: string): Promise<Product[]> {
+        return await this.productRepository.findByCategory(productCategoryUuid);
     }
 
     /**

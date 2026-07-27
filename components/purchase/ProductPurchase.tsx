@@ -1,37 +1,81 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import {
+    useEffect,
+} from "react";
+import {
+    useRouter,
+} from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
 import { usePurchaseProduct } from "@/components/hooks/usePurchaseProduct";
+import { useProductCategory } from "@/components/hooks/useProductCategory";
 
 export const ProductList = () => {
     const router = useRouter();
 
+    /**
+     * 商品一覧と商品検索
+     */
     const {
         products,
+        selectedCategoryUuid,
         isLoading,
         errorMessage,
         findAll,
+        findByCategory,
     } = usePurchaseProduct();
 
+    /**
+     * カテゴリ一覧
+     */
+    const {
+        categories,
+        isLoading: isCategoryLoading,
+        errorMessage: categoryErrorMessage,
+        findAll: findAllCategories,
+    } = useProductCategory();
+
+    /**
+     * 初回表示時に、
+     * 商品一覧とカテゴリ一覧を取得する。
+     */
     useEffect(() => {
         void findAll();
-    }, [findAll]);
+        void findAllCategories();
+    }, [
+        findAll,
+        findAllCategories,
+    ]);
+
+    /**
+     * カテゴリ選択時の処理
+     */
+    const handleCategoryChange = (
+        event:
+            React.ChangeEvent<HTMLSelectElement>,
+    ): void => {
+        const categoryUuid =
+            event.target.value;
+
+        void findByCategory(
+            categoryUuid,
+        );
+    };
+
+    const isPageLoading =
+        isLoading
+        || isCategoryLoading;
+
+    const displayErrorMessage =
+        errorMessage
+        || categoryErrorMessage;
+
 
     return (
         <div className="
             mx-auto
-            max-w-4xl
+            max-w-5xl
             rounded-lg
             border
             border-border
@@ -51,90 +95,219 @@ export const ProductList = () => {
                 商品一覧
             </h2>
 
-            {errorMessage && (
+            {/* カテゴリ選択 */}
+            <div className="
+                mb-8
+                flex
+                items-end
+                gap-4
+            ">
+                <div className="w-full max-w-sm">
+                    <label
+                        htmlFor="productCategory"
+                        className="
+                            mb-2
+                            block
+                            text-sm
+                            font-bold
+                            text-gray-700
+                        "
+                    >
+                        商品カテゴリ
+                    </label>
+
+                    <select
+                        id="productCategory"
+                        value={
+                            selectedCategoryUuid
+                        }
+                        disabled={
+                            isPageLoading
+                        }
+                        onChange={
+                            handleCategoryChange
+                        }
+                        className="
+                            h-10
+                            w-full
+                            rounded-md
+                            border
+                            border-gray-300
+                            bg-white
+                            px-3
+                            text-sm
+                            outline-none
+                            focus:border-green-700
+                            focus:ring-2
+                            focus:ring-green-200
+                            disabled:cursor-not-allowed
+                            disabled:opacity-50
+                        "
+                    >
+                        <option value="">
+                            すべてのカテゴリ
+                        </option>
+
+                        {categories.map(
+                            (category) => (
+                                <option
+                                    key={
+                                        category
+                                            .categoryUuid
+                                    }
+                                    value={
+                                        category
+                                            .categoryUuid
+                                    }
+                                >
+                                    {category.name}
+                                </option>
+                            ),
+                        )}
+                    </select>
+                </div>
+
+                <Button
+                    type="button"
+                    variant="outline"
+                    disabled={
+                        isPageLoading
+                        || selectedCategoryUuid === ""
+                    }
+                    onClick={() => {
+                        void findByCategory(
+                            "",
+                        );
+                    }}
+                >
+                    選択解除
+                </Button>
+            </div>
+
+            {displayErrorMessage && (
                 <div className="
                     mb-4
                     text-center
                     font-semibold
                     text-red-700
                 ">
-                    {errorMessage}
+                    {displayErrorMessage}
                 </div>
             )}
 
-            <Table>
-                <TableHeader>
-                    <TableRow className="bg-muted/50">
-                        <TableHead>商品名</TableHead>
-                        <TableHead>価格</TableHead>
-                        <TableHead>カテゴリ</TableHead>
-                        <TableHead>在庫</TableHead>
-                        <TableHead>詳細</TableHead>
-                    </TableRow>
-                </TableHeader>
+            {isLoading && (
+                <p className="
+                    mb-6
+                    text-center
+                    text-gray-500
+                ">
+                    商品を読み込んでいます。
+                </p>
+            )}
 
-                <TableBody>
-                    {products.map(
-                        (product) => {
-                            const quantity =
-                                product.productStock
-                                    ?.quantity
-                                ?? 0;
+            {!isLoading
+                && !errorMessage
+                && products.length === 0 && (
+                    <p className="
+                        text-center
+                        text-gray-500
+                    ">
+                        該当する商品がありません。
+                    </p>
+                )}
 
-                            return (
-                                <TableRow
-                                    key={
-                                        product
-                                            .productUuid
-                                    }
-                                >
-                                    <TableCell>
-                                        {product.name}
-                                    </TableCell>
+            <div className="
+                grid
+                grid-cols-1
+                gap-6
+                sm:grid-cols-2
+                lg:grid-cols-3
+            ">
+                {products.map(
+                    (product) => (
+                        <article
+                            key={
+                                product.productUuid
+                            }
+                            className="
+                                overflow-hidden
+                                rounded-lg
+                                border
+                                border-gray-200
+                                bg-white
+                                shadow-sm
+                                transition
+                                hover:-translate-y-1
+                                hover:shadow-md
+                            "
+                        >
+                            {/*
+                             * 商品画像用の空白領域
+                             */}
+                            <div className="
+                                h-48
+                                w-full
+                                bg-gray-50
+                            " />
 
-                                    <TableCell className="
-                                        text-right
+                            <div className="
+                                space-y-4
+                                p-5
+                            ">
+                                <div>
+                                    <h3 className="
+                                        text-lg
+                                        font-bold
+                                        text-gray-900
                                     ">
-                                        {product.price
-                                            .toLocaleString()}
-                                        円
-                                    </TableCell>
+                                        {product.name}
+                                    </h3>
 
-                                    <TableCell>
+                                    <p className="
+                                        mt-1
+                                        text-sm
+                                        text-gray-500
+                                    ">
                                         {product
                                             .productCategory
                                             ?.name
                                             ?? "未設定"}
-                                    </TableCell>
+                                    </p>
+                                </div>
 
-                                    <TableCell>
-                                        {quantity}
-                                    </TableCell>
+                                <p className="
+                                    text-xl
+                                    font-bold
+                                    text-red-600
+                                ">
+                                    {product.price
+                                        .toLocaleString()}
+                                    円
+                                </p>
 
-                                    <TableCell>
-                                        <Button
-                                            className="
-                                                w-full
-                                                bg-green-900
-                                            "
-                                            disabled={
-                                                isLoading
-                                            }
-                                            onClick={() => {
-                                                router.push(
-                                                    `/products/${product.productUuid}`,
-                                                );
-                                            }}
-                                        >
-                                            詳細
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        },
-                    )}
-                </TableBody>
-            </Table>
+                                <Button
+                                    type="button"
+                                    className="
+                                        w-full
+                                        bg-green-900
+                                        hover:bg-green-800
+                                    "
+                                    disabled={
+                                        isLoading
+                                    }
+                                    onClick={() => {
+                                        router.push(
+                                            `/products/detail/${product.productUuid}`,
+                                        );
+                                    }}
+                                >
+                                    詳細
+                                </Button>
+                            </div>
+                        </article>
+                    ),
+                )}
+            </div>
         </div>
     );
 };
