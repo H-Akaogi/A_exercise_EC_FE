@@ -203,7 +203,7 @@ export class CustomerRepository implements ICustomerRepository {
       mail,
     });
 
-    const url = `/proxy-api/account/validate//mail-address?${params.toString()}`;
+    const url = `/proxy-api/account/validate/mail-address?${params.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -335,9 +335,9 @@ export class CustomerRepository implements ICustomerRepository {
       title: responseData.title ?? "",
       message: responseData.message,
       customerUuid: responseData.customerUuid,
-      name: Customer.name,
-      username: Customer.username,
-      createdAt: Customer.createdAt,
+      name: responseData.name ?? Customer.name,
+      username: responseData.username ?? Customer.username,
+      createdAt: responseData.createdAt ?? "",
     };
   }
 }

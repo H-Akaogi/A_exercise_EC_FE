@@ -96,7 +96,7 @@ export const Header = () => {
                         "
                         onClick={() => {
                             router.push(
-                                "/account/register",
+                                "/account",
                             );
                         }}
                     >
