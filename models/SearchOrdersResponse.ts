@@ -4,10 +4,11 @@
 export type OrderSearchItem = {
   orderUuid: string;
   orderDate: string;
-  customerAccountName: string;
-  orderContent: string;
+  customerAccountName?: string;
+  orderContent?: string;
   orderStatus: string;
-  statusUpdateUrl: string;
+  totalPrice?: number;
+  detailUrl?: string;
 };
 
 /**

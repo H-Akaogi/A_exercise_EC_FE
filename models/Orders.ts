@@ -25,7 +25,7 @@ export interface Orders {
   /**
    * 顧客
    */
-  customer: Customer;
+  customer?: Customer;
 
   /**
    * 注文ステータス
@@ -35,7 +35,7 @@ export interface Orders {
   /**
    * 支払い方法
    */
-  paymentMethod: PaymentMethod;
+  paymentMethod?: PaymentMethod;
 
   /**
    * 注文明細リスト

@@ -18,4 +18,14 @@ export interface OrdersDetail {
    * 合計金額
    */
   count: number;
+
+  /**
+     * 購入時価格
+     */
+  price: number;
+
+  /**
+   * 小計
+   */
+  subtotal: number;
 }
