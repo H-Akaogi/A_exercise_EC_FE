@@ -7,8 +7,10 @@ export const TYPES = {
     IProductRepository: Symbol.for("IProductRepository"),
     IProductCategoryRepository: Symbol.for("IProductCategoryRepository"),
     IPaymentMethodRepository: Symbol.for("IPaymentMethodRepository"),
+    IOrderRepository: Symbol.for("IOrderRepository"),
     // サービス(ユースケース)層
     IPurchaseProductService: Symbol.for("IPurchaseProductService"),
     IProductCategoryService: Symbol.for("IProductCategoryService"),
     IPaymentMethodService: Symbol.for("IPaymentMethodService"),
+    IOrderService: Symbol.for("IOrderService"),
 };

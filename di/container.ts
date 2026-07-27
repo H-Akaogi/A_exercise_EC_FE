@@ -12,6 +12,10 @@ import { PaymentMethodRepository } from "@/infrastructures/PaymentMethodReposito
 import { IPaymentMethodRepository } from "@/interfaces/IPaymentMethodRepository";
 import { IPaymentMethodService } from "@/interfaces/IPaymentMethodService";
 import { PaymentMethodService } from "@/services/PaymentMethodService";
+import { OrderRepository } from "@/infrastructures/OrderRepository";
+import { IOrderRepository } from "@/interfaces/IOrderRepository";
+import { IOrderService } from "@/interfaces/IOrderService";
+import { OrderService } from "@/services/OrderService";
 
 /**
  * 演習 6-2 データアクセスとサービスを実装する
@@ -25,10 +29,12 @@ const container = new Container();
 container.bind<IProductRepository>(TYPES.IProductRepository).to(ProductRepository).inSingletonScope();
 container.bind<IProductCategoryRepository>(TYPES.IProductCategoryRepository).to(ProductCategoryRepository).inSingletonScope();
 container.bind<IPaymentMethodRepository>(TYPES.IPaymentMethodRepository).to(PaymentMethodRepository).inSingletonScope();
+container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository).inSingletonScope();
 // サービス(ユースケース)の
 container.bind<IPurchaseProductService>(TYPES.IPurchaseProductService).to(PurchaseProductService);
 container.bind<IProductCategoryService>(TYPES.IProductCategoryService).to(ProductCategoryService);
 container.bind<IPaymentMethodService>(TYPES.IPaymentMethodService).to(PaymentMethodService);
+container.bind<IOrderService>(TYPES.IOrderService).to(OrderService);
 
 
 export { container };
