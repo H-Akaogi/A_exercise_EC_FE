@@ -109,7 +109,7 @@ export class ProductRepository
    * 商品UUIDを指定して商品を取得する
    */
     public async findById(productUuid: string): Promise<Product | null> {
-        const url = `/proxy-api/product/detail/${encodeURIComponent(productUuid)}`;
+        const url = `/proxy-api/products/detail/${encodeURIComponent(productUuid)}`;
 
         const response = await fetch(url, {
             method: "GET",
