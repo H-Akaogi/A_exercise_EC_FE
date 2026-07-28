@@ -1,4 +1,5 @@
 import { Product } from "@/models/Product";
+import { ProductDetail } from "@/models/ProductDetail";
 
 export interface IPurchaseProductService {
     findByCategory(
@@ -13,7 +14,7 @@ export interface IPurchaseProductService {
  */
     findById(
         productUuid: string,
-    ): Promise<Product | null>;
+    ): Promise<ProductDetail | null>;
 
     purchase(
         paymentMethodId: number,

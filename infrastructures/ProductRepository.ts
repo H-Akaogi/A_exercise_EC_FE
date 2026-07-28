@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 
 import type { IProductRepository } from "../interfaces/IProductRepository";
 import type { Product } from "../models/Product";
+import { ProductDetail } from "@/models/ProductDetail";
 
 /**
  * 演習 6-2 データアクセスとサービスを実装する
@@ -108,7 +109,7 @@ export class ProductRepository
     /**
    * 商品UUIDを指定して商品を取得する
    */
-    public async findById(productUuid: string): Promise<Product | null> {
+    public async findById(productUuid: string): Promise<ProductDetail | null> {
         const url = `/proxy-api/products/detail/${encodeURIComponent(productUuid)}`;
 
         const response = await fetch(url, {

@@ -100,10 +100,7 @@ export const ProductDetail = () => {
     }
 
     const stockQuantity =
-        selectedProduct
-            .productStock
-            ?.quantity
-        ?? 0;
+        selectedProduct.stockQuantity;
 
     const isSoldOut =
         stockQuantity <= 0;
@@ -142,7 +139,7 @@ export const ProductDetail = () => {
             );
 
             setCartMessage(
-                `${selectedProduct.name}をかごに追加しました。`,
+                `${selectedProduct.productName}をかごに追加しました。`,
             );
         } catch (error) {
             setCartErrorMessage(
@@ -214,7 +211,7 @@ export const ProductDetail = () => {
                         商品名：
                     </span>
 
-                    {selectedProduct.name}
+                    {selectedProduct.productName}
                 </div>
 
                 <div>
@@ -225,17 +222,6 @@ export const ProductDetail = () => {
                     {selectedProduct.price
                         .toLocaleString()}
                     円
-                </div>
-
-                <div>
-                    <span className="font-bold">
-                        カテゴリ：
-                    </span>
-
-                    {selectedProduct
-                        .productCategory
-                        ?.name
-                        ?? "未設定"}
                 </div>
 
                 <div>

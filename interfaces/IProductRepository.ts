@@ -1,4 +1,5 @@
 import { Product } from "../models/Product";
+import { ProductDetail } from "@/models/ProductDetail";
 /**
  * 演習 6-2 データアクセスとサービスを実装する
  * 商品リポジトリインターフェース
@@ -25,7 +26,7 @@ export interface IProductRepository {
     */
     findById(
         productUuid: string,
-    ): Promise<Product | null>;
+    ): Promise<ProductDetail | null>;
 
 
     /**

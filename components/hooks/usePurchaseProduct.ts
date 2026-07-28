@@ -11,6 +11,7 @@ import { TYPES } from "@/di/types";
 
 import type { IPurchaseProductService } from "@/interfaces/IPurchaseProductService";
 import type { Product } from "@/models/Product";
+import { ProductDetail } from "@/models/ProductDetail";
 
 /**
  * 商品情報の取得に必要なStateと操作を提供するカスタムフック
@@ -45,7 +46,7 @@ export const usePurchaseProduct = () => {
     const [
         selectedProduct,
         setSelectedProduct,
-    ] = useState<Product | null>(null);
+    ] = useState<ProductDetail | null>(null);
 
     /**
      * 処理中フラグ

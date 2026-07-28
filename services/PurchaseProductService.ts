@@ -17,6 +17,8 @@ import type {
     Product,
 } from "@/models/Product";
 
+import { ProductDetail } from "@/models/ProductDetail";
+
 @injectable()
 export class PurchaseProductService
     implements IPurchaseProductService {
@@ -51,7 +53,7 @@ export class PurchaseProductService
      */
     public async findById(
         productUuid: string,
-    ): Promise<Product | null> {
+    ): Promise<ProductDetail | null> {
         return await this.productRepository
             .findById(
                 productUuid,

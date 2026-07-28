@@ -73,6 +73,15 @@ const nextConfig: NextConfig = {
       },
       {
         /**
+         * 購入API
+         */
+        source:
+          "/proxy-api/purchase/complete/:path*",
+        destination:
+          `${apiBaseUrl}/purchase/complete/:path*`,
+      },
+      {
+        /**
          * 商品一覧API
          */
         source:

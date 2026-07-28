@@ -255,10 +255,7 @@ export const CartPage = () => {
                             {cartItems.map(
                                 (item) => {
                                     const stockQuantity =
-                                        item.product
-                                            .productStock
-                                            ?.quantity
-                                        ?? 0;
+                                        item.product.stockQuantity;
 
                                     return (
                                         <TableRow
@@ -270,7 +267,7 @@ export const CartPage = () => {
                                             <TableCell>
                                                 {
                                                     item.product
-                                                        .name
+                                                        .productName
                                                 }
                                             </TableCell>
 

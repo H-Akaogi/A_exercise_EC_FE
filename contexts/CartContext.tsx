@@ -10,10 +10,10 @@ import {
     type ReactNode,
 } from "react";
 
-import type { Product } from "@/models/Product";
+import { ProductDetail } from "@/models/ProductDetail";
 
 export type CartItem = {
-    product: Product;
+    product: ProductDetail;
     quantity: number;
 };
 
@@ -22,7 +22,7 @@ type CartContextValue = {
     totalQuantity: number;
     totalPrice: number;
     addCart: (
-        product: Product,
+        product: ProductDetail,
         quantity: number,
     ) => void;
     removeCart: (
@@ -103,11 +103,11 @@ export const CartProvider = ({
     const addCart =
         useCallback(
             (
-                product: Product,
+                product: ProductDetail,
                 quantity: number,
             ): void => {
                 const stockQuantity =
-                    product.productStock?.quantity
+                    product.stockQuantity
                     ?? 0;
 
                 if (
@@ -234,10 +234,7 @@ export const CartProvider = ({
                                 }
 
                                 const stockQuantity =
-                                    item.product
-                                        .productStock
-                                        ?.quantity
-                                    ?? 0;
+                                    item.product.stockQuantity;
 
                                 if (
                                     quantity
