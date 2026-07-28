@@ -67,6 +67,9 @@ export class CustomerAuthService
             isAuthenticated: true,
             expiresAt:
                 response.expiresAt,
+            username:
+                response.username
+                ?? null,
         };
     }
 
@@ -101,6 +104,7 @@ export class CustomerAuthService
             return {
                 isAuthenticated: false,
                 expiresAt: null,
+                username: null,
             };
         }
 
@@ -108,6 +112,9 @@ export class CustomerAuthService
             isAuthenticated: true,
             expiresAt:
                 session.expiresAt,
+            username:
+                session.username
+                ?? null,
         };
     }
 

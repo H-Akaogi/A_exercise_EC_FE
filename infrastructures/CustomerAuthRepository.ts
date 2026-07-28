@@ -94,11 +94,21 @@ export class CustomerAuthRepository
             );
         }
 
+        const username =
+            normalizeOptionalUsername(
+                responseData.username,
+            );
+
         return {
             accessToken:
                 responseData.accessToken,
             expiresAt:
                 responseData.expiresAt,
+            ...(username
+                ? {
+                    username,
+                }
+                : {}),
         };
     }
 
@@ -193,4 +203,20 @@ const readErrorMessage =
             ?? errorData.detail
             ?? errorData.title
             ?? fallbackMessage;
+    };
+
+const normalizeOptionalUsername =
+    (
+        value: unknown,
+    ): string | undefined => {
+        if (typeof value !== "string") {
+            return undefined;
+        }
+
+        const username =
+            value.trim();
+
+        return username.length > 0
+            ? username
+            : undefined;
     };

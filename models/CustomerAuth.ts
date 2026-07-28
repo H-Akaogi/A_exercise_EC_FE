@@ -12,6 +12,7 @@ export type CustomerLoginRequest = {
 export type CustomerLoginResponse = {
     accessToken: string;
     expiresAt: string;
+    username?: string;
 };
 
 /**
@@ -27,6 +28,7 @@ export type CustomerLogoutResponse = {
 export type CustomerAuthSession = {
     accessToken: string;
     expiresAt: string;
+    username?: string;
 };
 
 /**
@@ -36,6 +38,7 @@ export type CustomerAuthSession = {
 export type CustomerAuthState = {
     isAuthenticated: boolean;
     expiresAt: string | null;
+    username?: string | null;
 };
 
 export type CustomerLoginFieldErrors = Partial<

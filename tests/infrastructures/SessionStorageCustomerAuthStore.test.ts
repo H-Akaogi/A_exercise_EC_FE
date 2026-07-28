@@ -41,13 +41,15 @@ describe(
         });
 
         it(
-            "accessTokenとexpiresAtだけを保存して復元する",
+            "accessToken・expiresAt・usernameを保存して復元する",
             () => {
                 const session = {
                     accessToken:
                         "customer-jwt",
                     expiresAt:
                         "2026-07-27T12:30:00.000Z",
+                    username:
+                        "andoTaro",
                 };
 
                 store.save(session);
@@ -77,6 +79,8 @@ describe(
                             "expired-jwt",
                         expiresAt:
                             "2026-07-27T11:59:59.999Z",
+                        username:
+                            "andoTaro",
                     }),
                 );
 
@@ -102,6 +106,8 @@ describe(
                             "expired-jwt",
                         expiresAt:
                             "2026-07-27T12:00:00.000Z",
+                        username:
+                            "andoTaro",
                     }),
                 );
 
@@ -139,6 +145,8 @@ describe(
                     JSON.stringify({
                         expiresAt:
                             "2026-07-27T12:30:00.000Z",
+                        username:
+                            "andoTaro",
                     }),
                 );
 
@@ -155,6 +163,39 @@ describe(
         );
 
         it(
+            "usernameがない2項目の保存データを復元する",
+            () => {
+                const session = {
+                    accessToken:
+                        "customer-jwt",
+                    expiresAt:
+                        "2026-07-27T12:30:00.000Z",
+                };
+
+                window.sessionStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(
+                        session,
+                    ),
+                );
+
+                expect(
+                    store.getValidSession(),
+                ).toEqual(session);
+                expect(
+                    window.sessionStorage
+                        .getItem(
+                            STORAGE_KEY,
+                        ),
+                ).toBe(
+                    JSON.stringify(
+                        session,
+                    ),
+                );
+            },
+        );
+
+        it(
             "期限切れの認証情報は保存しない",
             () => {
                 expect(
@@ -164,6 +205,8 @@ describe(
                                 "expired-jwt",
                             expiresAt:
                                 "2026-07-27T11:59:59.999Z",
+                            username:
+                                "andoTaro",
                         });
                     },
                 ).toThrow(
@@ -193,6 +236,8 @@ describe(
                                 "customer-jwt",
                             expiresAt:
                                 "2026-07-27T12:30:00.000Z",
+                            username:
+                                "andoTaro",
                         });
                     },
                 ).toThrow(

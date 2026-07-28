@@ -57,6 +57,8 @@ describe(
                                             "customer-jwt",
                                         expiresAt:
                                             "2026-07-27T12:34:56+00:00",
+                                        username:
+                                            "andoTaro",
                                     },
                                 ),
                             );
@@ -81,6 +83,8 @@ describe(
                             "customer-jwt",
                         expiresAt:
                             "2026-07-27T12:34:56+00:00",
+                        username:
+                            "andoTaro",
                     });
 
                     const [
@@ -240,6 +244,8 @@ describe(
                                     {
                                         expiresAt:
                                             "2026-07-27T12:34:56+00:00",
+                                        username:
+                                            "andoTaro",
                                     },
                                 ),
                             ),
@@ -255,6 +261,41 @@ describe(
                     ).rejects.toThrow(
                         "ログイン応答の形式が正しくありません。",
                     );
+                },
+            );
+
+            it(
+                "正式な2項目の成功応答を受け入れる",
+                async () => {
+                    vi.stubGlobal(
+                        "fetch",
+                        vi.fn()
+                            .mockResolvedValue(
+                                createResponse(
+                                    200,
+                                    {
+                                        accessToken:
+                                            "customer-jwt",
+                                        expiresAt:
+                                            "2026-07-27T12:34:56+00:00",
+                                    },
+                                ),
+                            ),
+                    );
+
+                    await expect(
+                        repository.login({
+                            mailAddress:
+                                "ando.taro@example.com",
+                            password:
+                                "Test12345",
+                        }),
+                    ).resolves.toEqual({
+                        accessToken:
+                            "customer-jwt",
+                        expiresAt:
+                            "2026-07-27T12:34:56+00:00",
+                    });
                 },
             );
 
@@ -283,6 +324,8 @@ describe(
                                             "secret-jwt",
                                         expiresAt:
                                             "2026-07-27T12:34:56+00:00",
+                                        username:
+                                            "andoTaro",
                                     },
                                 ),
                             ),

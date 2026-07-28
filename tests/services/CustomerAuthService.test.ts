@@ -37,6 +37,8 @@ describe(
                 "customer-jwt",
             expiresAt:
                 "2099-07-27T12:30:00.000Z",
+            username:
+                "andoTaro",
         };
 
         beforeEach(() => {
@@ -93,6 +95,8 @@ describe(
                             true,
                         expiresAt:
                             futureSession.expiresAt,
+                        username:
+                            futureSession.username,
                     });
 
                     expect(
@@ -107,6 +111,46 @@ describe(
                         sessionStore.save,
                     ).toHaveBeenCalledWith(
                         futureSession,
+                    );
+                },
+            );
+
+            it(
+                "usernameがない正式応答では表示名をnullにする",
+                async () => {
+                    const response = {
+                        accessToken:
+                            "customer-jwt",
+                        expiresAt:
+                            "2099-07-27T12:30:00.000Z",
+                    };
+
+                    vi.mocked(
+                        repository.login,
+                    ).mockResolvedValue(
+                        response,
+                    );
+
+                    await expect(
+                        service.login({
+                            mailAddress:
+                                "ando.taro@example.com",
+                            password:
+                                "Test12345",
+                        }),
+                    ).resolves.toEqual({
+                        isAuthenticated:
+                            true,
+                        expiresAt:
+                            response.expiresAt,
+                        username:
+                            null,
+                    });
+
+                    expect(
+                        sessionStore.save,
+                    ).toHaveBeenCalledWith(
+                        response,
                     );
                 },
             );
@@ -286,6 +330,8 @@ describe(
                         true,
                     expiresAt:
                         futureSession.expiresAt,
+                    username:
+                        futureSession.username,
                 });
                 expect(
                     service.getAccessToken(),
@@ -311,6 +357,8 @@ describe(
                     isAuthenticated:
                         false,
                     expiresAt:
+                        null,
+                    username:
                         null,
                 });
                 expect(

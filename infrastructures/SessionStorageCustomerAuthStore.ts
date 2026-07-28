@@ -163,6 +163,17 @@ const isValidSessionShape =
                     candidate.expiresAt,
                 ),
             )
+            && (
+                candidate.username
+                    === undefined
+                || (
+                    typeof candidate.username
+                        === "string"
+                    && candidate.username
+                        .trim()
+                        .length > 0
+                )
+            )
         );
     };
 
