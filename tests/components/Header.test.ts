@@ -73,6 +73,8 @@ vi.mock(
                     null,
                 isInitialized:
                     true,
+                sessionMessage:
+                    null,
                 login:
                     vi.fn(),
                 logout:

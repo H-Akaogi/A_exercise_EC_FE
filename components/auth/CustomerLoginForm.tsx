@@ -35,6 +35,7 @@ export const CustomerLoginForm = () => {
         useRouter();
     const {
         login,
+        sessionMessage,
     } = useCustomerAuth();
 
     const [
@@ -69,6 +70,11 @@ export const CustomerLoginForm = () => {
 
     const submissionInProgress =
         useRef<boolean>(false);
+
+    const displayedErrorMessage =
+        errorMessage
+        || sessionMessage
+        || "";
 
     const handleSubmit =
         async (
@@ -150,7 +156,7 @@ export const CustomerLoginForm = () => {
                     ログイン
                 </h1>
 
-                {errorMessage && (
+                {displayedErrorMessage && (
                     <p
                         role="alert"
                         className="
@@ -164,7 +170,7 @@ export const CustomerLoginForm = () => {
                             text-red-700
                         "
                     >
-                        {errorMessage}
+                        {displayedErrorMessage}
                     </p>
                 )}
 

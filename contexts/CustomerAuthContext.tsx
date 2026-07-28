@@ -8,6 +8,9 @@ import {
     useState,
     type ReactNode,
 } from "react";
+import {
+    useRouter,
+} from "next/navigation";
 
 import {
     container,
@@ -29,6 +32,7 @@ export type CustomerAuthContextValue = {
     isAuthenticated: boolean;
     expiresAt: string | null;
     isInitialized: boolean;
+    sessionMessage: string | null;
     login(
         request: CustomerLoginRequest,
     ): Promise<void>;
@@ -47,8 +51,11 @@ export const CustomerAuthContext =
 const MAX_TIMEOUT_MILLISECONDS =
     2_147_483_647;
 
+const SESSION_EXPIRED_MESSAGE =
+    "セッションが切れました。再度ログインしてください";
+
 type CustomerAuthProviderProps = {
-    children: ReactNode;
+    children?: ReactNode;
     /**
      * 単体テストでServiceを差し替えるための任意指定。
      */
@@ -62,6 +69,9 @@ export const CustomerAuthProvider = ({
     children,
     service: providedService,
 }: CustomerAuthProviderProps) => {
+    const router =
+        useRouter();
+
     const service =
         useMemo(
             () =>
@@ -91,16 +101,41 @@ export const CustomerAuthProvider = ({
         setIsInitialized,
     ] = useState<boolean>(false);
 
+    const [
+        sessionMessage,
+        setSessionMessage,
+    ] = useState<string | null>(null);
+
     const clearAuthentication =
         useCallback(
             (): void => {
                 service
                     .clearAuthentication();
-                setIsAuthenticated(false);
-                setExpiresAt(null);
             },
             [service],
         );
+
+    useEffect(() => {
+        const unsubscribe =
+            service
+                .subscribeToAuthenticationCleared(
+                    () => {
+                        setIsAuthenticated(false);
+                        setExpiresAt(null);
+                        setSessionMessage(
+                            SESSION_EXPIRED_MESSAGE,
+                        );
+                        router.replace(
+                            "/login",
+                        );
+                    },
+                );
+
+        return unsubscribe;
+    }, [
+        router,
+        service,
+    ]);
 
     useEffect(() => {
         let isCancelled =
@@ -128,6 +163,7 @@ export const CustomerAuthProvider = ({
                 setExpiresAt(
                     authState.expiresAt,
                 );
+                setSessionMessage(null);
                 setIsInitialized(true);
             };
 
@@ -199,6 +235,7 @@ export const CustomerAuthProvider = ({
                         request,
                     );
 
+                setSessionMessage(null);
                 setIsAuthenticated(
                     authState.isAuthenticated,
                 );
@@ -221,6 +258,7 @@ export const CustomerAuthProvider = ({
                      */
                     setIsAuthenticated(false);
                     setExpiresAt(null);
+                    setSessionMessage(null);
                 }
             },
             [service],
@@ -241,6 +279,7 @@ export const CustomerAuthProvider = ({
                 isAuthenticated,
                 expiresAt,
                 isInitialized,
+                sessionMessage,
                 login,
                 logout,
                 getAccessToken,
@@ -250,6 +289,7 @@ export const CustomerAuthProvider = ({
                 isAuthenticated,
                 expiresAt,
                 isInitialized,
+                sessionMessage,
                 login,
                 logout,
                 getAccessToken,

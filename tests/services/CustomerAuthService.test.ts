@@ -318,5 +318,36 @@ describe(
                 ).toBeNull();
             },
         );
+
+        it(
+            "認証情報削除を購読中のUIへ通知する",
+            () => {
+                const listener =
+                    vi.fn();
+                const unsubscribe =
+                    service
+                        .subscribeToAuthenticationCleared(
+                            listener,
+                        );
+
+                service
+                    .clearAuthentication();
+
+                expect(
+                    sessionStore.clear,
+                ).toHaveBeenCalledOnce();
+                expect(
+                    listener,
+                ).toHaveBeenCalledOnce();
+
+                unsubscribe();
+                service
+                    .clearAuthentication();
+
+                expect(
+                    listener,
+                ).toHaveBeenCalledOnce();
+            },
+        );
     },
 );

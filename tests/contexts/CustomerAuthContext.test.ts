@@ -34,10 +34,30 @@ import type {
     ICustomerAuthService,
 } from "@/interfaces/ICustomerAuthService";
 
+const navigationMocks =
+    vi.hoisted(
+        () => ({
+            replace:
+                vi.fn(),
+        }),
+    );
+
+vi.mock(
+    "next/navigation",
+    () => ({
+        useRouter:
+            () => ({
+                replace:
+                    navigationMocks.replace,
+            }),
+    }),
+);
+
 const AuthConsumer = () => {
     const {
         isAuthenticated,
         isInitialized,
+        sessionMessage,
         login,
         logout,
     } = useCustomerAuth();
@@ -58,6 +78,12 @@ const AuthConsumer = () => {
             isAuthenticated
                 ? "authenticated"
                 : "anonymous",
+        ),
+        createElement(
+            "span",
+            null,
+            sessionMessage
+            ?? "no-session-message",
         ),
         createElement(
             "button",
@@ -112,8 +138,15 @@ describe(
     () => {
         let service:
             ICustomerAuthService;
+        let authenticationClearedListener:
+            (() => void) | undefined;
 
         beforeEach(() => {
+            authenticationClearedListener =
+                undefined;
+            navigationMocks.replace
+                .mockReset();
+
             service = {
                 login:
                     vi.fn()
@@ -142,7 +175,24 @@ describe(
                             null,
                         ),
                 clearAuthentication:
-                    vi.fn(),
+                    vi.fn(
+                        () => {
+                            authenticationClearedListener
+                                ?.();
+                        },
+                    ),
+                subscribeToAuthenticationCleared:
+                    vi.fn(
+                        (
+                            listener:
+                                () => void,
+                        ) => {
+                            authenticationClearedListener =
+                                listener;
+
+                            return vi.fn();
+                        },
+                    ),
             };
         });
 
@@ -181,6 +231,55 @@ describe(
                             ),
                         ).toBeDefined();
                     },
+                );
+            },
+        );
+
+        it(
+            "保護APIの401通知で未認証へ切り替えてログイン画面へ遷移する",
+            async () => {
+                vi.mocked(
+                    service.getAuthState,
+                ).mockReturnValue({
+                    isAuthenticated:
+                        true,
+                    expiresAt:
+                        "2099-07-27T12:30:00.000Z",
+                });
+
+                renderAuthProvider(
+                    service,
+                );
+
+                await waitFor(
+                    () => {
+                        expect(
+                            screen.getByText(
+                                "authenticated",
+                            ),
+                        ).toBeDefined();
+                    },
+                );
+
+                act(() => {
+                    service
+                        .clearAuthentication();
+                });
+
+                expect(
+                    screen.getByText(
+                        "anonymous",
+                    ),
+                ).toBeDefined();
+                expect(
+                    screen.getByText(
+                        "セッションが切れました。再度ログインしてください",
+                    ),
+                ).toBeDefined();
+                expect(
+                    navigationMocks.replace,
+                ).toHaveBeenCalledWith(
+                    "/login",
                 );
             },
         );

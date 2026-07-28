@@ -35,6 +35,8 @@ const mocks =
         () => ({
             login:
                 vi.fn(),
+            sessionMessage:
+                null as string | null,
             replace:
                 vi.fn(),
         }),
@@ -62,6 +64,8 @@ vi.mock(
                     null,
                 isInitialized:
                     true,
+                sessionMessage:
+                    mocks.sessionMessage,
                 login:
                     mocks.login,
                 logout:
@@ -82,6 +86,8 @@ describe(
     "CustomerLoginForm",
     () => {
         beforeEach(() => {
+            mocks.sessionMessage =
+                null;
             mocks.login
                 .mockReset()
                 .mockResolvedValue(
@@ -94,6 +100,28 @@ describe(
         afterEach(() => {
             cleanup();
         });
+
+        it(
+            "セッションタイムアウトの案内を表示する",
+            () => {
+                mocks.sessionMessage =
+                    "セッションが切れました。再度ログインしてください";
+
+                render(
+                    createElement(
+                        CustomerLoginForm,
+                    ),
+                );
+
+                expect(
+                    screen.getByRole(
+                        "alert",
+                    ),
+                ).toHaveTextContent(
+                    "セッションが切れました。再度ログインしてください",
+                );
+            },
+        );
 
         it(
             "メールアドレスとマスクされたパスワード入力を表示する",

@@ -33,6 +33,9 @@ const EMAIL_PATTERN =
 @injectable()
 export class CustomerAuthService
     implements ICustomerAuthService {
+    private readonly authenticationClearedListeners =
+        new Set<() => void>();
+
     constructor(
         @inject(
             TYPES.ICustomerAuthRepository,
@@ -119,6 +122,35 @@ export class CustomerAuthService
     public clearAuthentication():
         void {
         this.sessionStore.clear();
+
+        for (
+            const listener
+            of this.authenticationClearedListeners
+        ) {
+            try {
+                listener();
+            } catch {
+                /*
+                 * 認証情報の削除は完了済みのため、
+                 * UI通知側の例外を呼び出し元へ伝播させない。
+                 */
+            }
+        }
+    }
+
+    public subscribeToAuthenticationCleared(
+        listener: () => void,
+    ): () => void {
+        this.authenticationClearedListeners.add(
+            listener,
+        );
+
+        return () => {
+            this.authenticationClearedListeners
+                .delete(
+                    listener,
+                );
+        };
     }
 }
 

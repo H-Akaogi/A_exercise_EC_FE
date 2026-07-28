@@ -18,4 +18,8 @@ export interface ICustomerAuthService {
     getAccessToken(): string | null;
 
     clearAuthentication(): void;
+
+    subscribeToAuthenticationCleared(
+        listener: () => void,
+    ): () => void;
 }
