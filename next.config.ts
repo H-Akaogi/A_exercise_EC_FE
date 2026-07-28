@@ -4,7 +4,7 @@ import type {
 
 const apiBaseUrl = (
   process.env.API_BASE_URL ??
-  "http://127.0.0.1:5100"
+  "https://fullness-stationery.japaneast.cloudapp.azure.com/ec-api"
 ).replace(/\/+$/, "");
 
 const nextConfig: NextConfig = {
