@@ -4,23 +4,30 @@ import {
     useEffect,
     useState,
 } from "react";
+import Image from "next/image";
 import {
     useParams,
     useRouter,
 } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
-import { usePurchaseProduct } from "@/components/hooks/usePurchaseProduct";
-import { useCart } from "@/contexts/CartContext";
+import {
+    usePurchaseProduct,
+} from "@/components/hooks/usePurchaseProduct";
+
+import {
+    useCart,
+} from "@/contexts/CartContext";
 
 export const ProductDetail = () => {
-    const params = useParams<{
-        productUuid: string;
-    }>();
+    const params =
+        useParams<{
+            productUuid: string;
+        }>();
 
-    const router = useRouter();
+    const router =
+        useRouter();
 
     /*
      * 商品取得に関する処理は
@@ -70,9 +77,16 @@ export const ProductDetail = () => {
         findById,
     ]);
 
-    if (isLoading && !selectedProduct) {
+    if (
+        isLoading
+        && !selectedProduct
+    ) {
         return (
-            <p className="text-center">
+            <p className="
+                py-12
+                text-center
+                text-gray-500
+            ">
                 読み込み中です
             </p>
         );
@@ -80,13 +94,21 @@ export const ProductDetail = () => {
 
     if (!selectedProduct) {
         return (
-            <div className="text-center">
-                <p>
-                    商品が見つかりませんでした。
+            <div className="
+                py-12
+                text-center
+            ">
+                <p className="
+                    mb-4
+                    font-semibold
+                    text-red-700
+                ">
+                    {errorMessage
+                        || "商品が見つかりませんでした。"}
                 </p>
 
                 <Button
-                    className="mt-4"
+                    type="button"
                     onClick={() => {
                         router.push(
                             "/products/search",
@@ -102,14 +124,6 @@ export const ProductDetail = () => {
     const stockQuantity =
         selectedProduct.stockQuantity;
 
-    const isSoldOut =
-        stockQuantity <= 0;
-
-    const isInvalidQuantity =
-        !Number.isInteger(quantity)
-        || quantity <= 0
-        || quantity > stockQuantity;
-
     const currentCartQuantity =
         cartItems.find(
             (item) =>
@@ -117,61 +131,75 @@ export const ProductDetail = () => {
                 === selectedProduct.productUuid,
         )?.quantity ?? 0;
 
+    const remainingQuantity =
+        Math.max(
+            stockQuantity
+            - currentCartQuantity,
+            0,
+        );
+
+    const isSoldOut =
+        stockQuantity <= 0;
+
+    const isInvalidQuantity =
+        !Number.isInteger(
+            quantity,
+        )
+        || quantity <= 0
+        || quantity > remainingQuantity;
+
     const canAddCart =
         !isLoading
         && !isSoldOut
-        && !isInvalidQuantity
-        && currentCartQuantity
-        + quantity
-        <= stockQuantity;
+        && !isInvalidQuantity;
+
+    const quantityOptions =
+        Array.from(
+            {
+                length:
+                    remainingQuantity,
+            },
+            (
+                _,
+                index,
+            ) => index + 1,
+        );
 
     /**
      * 商品をかごへ追加する
      */
-    const handleAddCart = (): void => {
-        setCartMessage("");
-        setCartErrorMessage("");
+    const handleAddCart =
+        (): void => {
+            setCartMessage("");
+            setCartErrorMessage("");
 
-        try {
-            addCart(
-                selectedProduct,
-                quantity,
-            );
+            try {
+                addCart(
+                    selectedProduct,
+                    quantity,
+                );
 
-            setCartMessage(
-                `${selectedProduct.productName}をかごに追加しました。`,
-            );
-        } catch (error) {
-            setCartErrorMessage(
-                error instanceof Error
-                    ? error.message
-                    : "かごへの追加に失敗しました。",
-            );
-        }
-    };
+                setCartMessage(
+                    `${selectedProduct.productName}をかごに追加しました。`,
+                );
+
+                setQuantity(1);
+            } catch (error) {
+                setCartErrorMessage(
+                    error instanceof Error
+                        ? error.message
+                        : "かごへの追加に失敗しました。",
+                );
+            }
+        };
 
     return (
         <div className="
             mx-auto
-            max-w-xl
-            rounded-lg
-            border
-            border-border
-            bg-white
-            p-8
-            shadow-sm
+            max-w-6xl
+            px-6
+            py-10
         ">
-            <h2 className="
-                mb-6
-                border-b
-                pb-4
-                text-center
-                text-2xl
-                font-bold
-            ">
-                商品購入
-            </h2>
-
             {errorMessage && (
                 <p className="
                     mb-4
@@ -205,136 +233,242 @@ export const ProductDetail = () => {
                 </p>
             )}
 
-            <div className="space-y-4">
-                <div>
-                    <span className="font-bold">
-                        商品名：
-                    </span>
+            <div className="
+                grid
+                gap-10
+                lg:grid-cols-[minmax(0,1fr)_320px]
+            ">
+                {/* 商品名・商品画像 */}
+                <section className="
+                    min-h-[460px]
+                    rounded-lg
+                    border
+                    border-border
+                    bg-white
+                    p-8
+                    shadow-sm
+                ">
+                    <h1 className="
+                        mb-6
+                        text-3xl
+                        font-bold
+                        text-gray-900
+                    ">
+                        {selectedProduct.productName}
+                    </h1>
 
-                    {selectedProduct.productName}
-                </div>
+                    <div className="
+                        relative
+                        flex
+                        min-h-[340px]
+                        items-center
+                        justify-center
+                        overflow-hidden
+                        rounded-md
+                        bg-gray-50
+                    ">
+                        {selectedProduct.productImage ? (
+                            <Image
+                                src={
+                                    selectedProduct.productImage
+                                }
+                                alt={
+                                    selectedProduct.productName
+                                }
+                                fill
+                                priority
+                                className="
+                                    object-contain
+                                    p-8
+                                "
+                                sizes="
+                                    (max-width: 1024px) 100vw,
+                                    70vw
+                                "
+                            />
+                        ) : (
+                            <div className="
+                                flex
+                                min-h-[340px]
+                                w-full
+                                items-center
+                                justify-center
+                                text-gray-400
+                            ">
+                                画像なし
+                            </div>
+                        )}
+                    </div>
+                </section>
 
-                <div>
-                    <span className="font-bold">
-                        価格：
-                    </span>
-
-                    {selectedProduct.price
-                        .toLocaleString()}
-                    円
-                </div>
-
-                <div>
-                    <span className="font-bold">
-                        在庫：
-                    </span>
-
-                    {stockQuantity}
-                </div>
-
-                <div>
-                    <label
-                        htmlFor="quantity"
-                        className="
-                            mb-2
-                            block
-                            font-bold
-                        "
-                    >
-                        購入個数
-                    </label>
-
-                    <Input
-                        id="quantity"
-                        type="number"
-                        min={1}
-                        max={stockQuantity}
-                        value={quantity}
-                        disabled={isSoldOut}
-                        onChange={(event) => {
-                            setQuantity(
-                                Number(
-                                    event.target
-                                        .value,
-                                ),
-                            );
-
-                            setCartMessage("");
-                            setCartErrorMessage("");
-                        }}
-                    />
-                </div>
-
-                {quantity <= 0 && (
-                    <p className="text-sm text-red-700">
-                        1個以上を指定してください。
+                {/* 購入操作 */}
+                <aside className="
+                    h-fit
+                    rounded-lg
+                    border
+                    border-gray-300
+                    bg-white
+                    p-6
+                    shadow-sm
+                    lg:sticky
+                    lg:top-24
+                ">
+                    <p className="
+                        mb-1
+                        text-sm
+                        text-gray-500
+                    ">
+                        価格
                     </p>
-                )}
 
-                {quantity > stockQuantity && (
-                    <p className="text-sm text-red-700">
-                        在庫数以内の個数を指定してください。
+                    <p className="
+                        mb-5
+                        text-3xl
+                        font-bold
+                        text-red-600
+                    ">
+                        {selectedProduct.price
+                            .toLocaleString()}
+                        円
                     </p>
-                )}
 
-                {currentCartQuantity > 0 && (
-                    <p className="text-sm text-gray-600">
-                        現在かごに
-                        {currentCartQuantity}
-                        個入っています。
-                    </p>
-                )}
-
-                {currentCartQuantity
-                    + quantity
-                    > stockQuantity
-                    && quantity > 0 && (
-                        <p className="text-sm text-red-700">
-                            すでにかごへ入っている数量との合計が、
-                            在庫数を超えています。
+                    {currentCartQuantity > 0 && (
+                        <p className="
+                            mb-4
+                            rounded-md
+                            bg-gray-50
+                            p-3
+                            text-sm
+                            text-gray-600
+                        ">
+                            現在かごに
+                            {currentCartQuantity}
+                            個入っています。
                         </p>
                     )}
 
-                <Button
-                    className="
-                        w-full
-                        bg-green-900
-                    "
-                    disabled={!canAddCart}
-                    onClick={
-                        handleAddCart
-                    }
-                >
-                    {isSoldOut
-                        ? "売り切れ"
-                        : "かごに追加"}
-                </Button>
+                    <div className="mb-5">
+                        <label
+                            htmlFor="quantity"
+                            className="
+                                mb-2
+                                block
+                                text-sm
+                                font-bold
+                                text-gray-700
+                            "
+                        >
+                            数量
+                        </label>
 
-                <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                        router.push(
-                            "/purchase",
-                        );
-                    }}
-                >
-                    かごを確認する
-                </Button>
+                        <select
+                            id="quantity"
+                            value={quantity}
+                            disabled={
+                                isSoldOut
+                                || remainingQuantity <= 0
+                            }
+                            onChange={(event) => {
+                                setQuantity(
+                                    Number(
+                                        event.target.value,
+                                    ),
+                                );
 
-                <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                        router.push(
-                            "/products/search",
-                        );
-                    }}
-                >
-                    商品一覧へ戻る
-                </Button>
+                                setCartMessage("");
+                                setCartErrorMessage("");
+                            }}
+                            className="
+                                h-10
+                                w-full
+                                rounded-md
+                                border
+                                border-gray-300
+                                bg-white
+                                px-3
+                                text-sm
+                                outline-none
+                                focus:border-green-700
+                                focus:ring-2
+                                focus:ring-green-200
+                                disabled:cursor-not-allowed
+                                disabled:opacity-50
+                            "
+                        >
+                            {quantityOptions.map(
+                                (value) => (
+                                    <option
+                                        key={value}
+                                        value={value}
+                                    >
+                                        {value}
+                                    </option>
+                                ),
+                            )}
+                        </select>
+                    </div>
+
+                    {remainingQuantity <= 0
+                        && !isSoldOut && (
+                            <p className="
+                                mb-4
+                                text-sm
+                                font-semibold
+                                text-red-700
+                            ">
+                                在庫数分がすでにかごに入っています。
+                            </p>
+                        )}
+
+                    <Button
+                        type="button"
+                        className="
+                            w-full
+                            bg-green-700
+                            hover:bg-green-800
+                        "
+                        disabled={!canAddCart}
+                        onClick={
+                            handleAddCart
+                        }
+                    >
+                        {isSoldOut
+                            ? "売り切れ"
+                            : "カートに入れる"}
+                    </Button>
+
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="
+                            mt-3
+                            w-full
+                        "
+                        onClick={() => {
+                            router.push(
+                                "/purchase",
+                            );
+                        }}
+                    >
+                        かごを確認する
+                    </Button>
+
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        className="
+                            mt-2
+                            w-full
+                        "
+                        onClick={() => {
+                            router.push(
+                                "/products/search",
+                            );
+                        }}
+                    >
+                        商品一覧へ戻る
+                    </Button>
+                </aside>
             </div>
         </div>
     );

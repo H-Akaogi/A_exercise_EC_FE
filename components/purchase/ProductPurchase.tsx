@@ -7,6 +7,8 @@ import {
     useRouter,
 } from "next/navigation";
 
+import Image from "next/image";
+
 import { Button } from "@/components/ui/button";
 import { usePurchaseProduct } from "@/components/hooks/usePurchaseProduct";
 import { useProductCategory } from "@/components/hooks/useProductCategory";
@@ -241,14 +243,42 @@ export const ProductList = () => {
                                 hover:shadow-md
                             "
                         >
-                            {/*
-                             * 商品画像用の空白領域
-                             */}
                             <div className="
-                                h-48
-                                w-full
-                                bg-gray-50
-                            " />
+    relative
+    h-48
+    w-full
+    overflow-hidden
+    bg-gray-50
+">
+                                {product.imageUrl ? (
+                                    <Image
+                                        src={product.imageUrl}
+                                        alt={product.name}
+                                        fill
+                                        className="
+                                                    object-contain
+                                                    p-4
+                                                "
+                                        sizes="
+                                                (max-width: 640px) 100vw,
+                                                (max-width: 1024px) 50vw,
+                                                33vw
+                                            "
+                                    />
+                                ) : (
+                                    <div className="
+                                        flex
+                                        h-full
+                                        w-full 
+                                        items-center
+                                        justify-center
+                                        text-sm
+                                        text-gray-400
+                                    ">
+                                        画像なし
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="
                                 space-y-4
