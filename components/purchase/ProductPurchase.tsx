@@ -2,6 +2,8 @@
 
 import {
     useEffect,
+    useMemo,
+    useState,
 } from "react";
 import {
     useRouter,
@@ -15,6 +17,13 @@ import { useProductCategory } from "@/components/hooks/useProductCategory";
 
 export const ProductList = () => {
     const router = useRouter();
+
+    const ITEMS_PER_PAGE = 12;
+
+    const [
+        currentPage,
+        setCurrentPage,
+    ] = useState<number>(1);
 
     /**
      * 商品一覧と商品検索
@@ -60,6 +69,8 @@ export const ProductList = () => {
         const categoryUuid =
             event.target.value;
 
+        setCurrentPage(1);
+
         void findByCategory(
             categoryUuid,
         );
@@ -72,6 +83,43 @@ export const ProductList = () => {
     const displayErrorMessage =
         errorMessage
         || categoryErrorMessage;
+
+    /**
+ * 総ページ数
+ */
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                products.length
+                / ITEMS_PER_PAGE,
+            ),
+        );
+
+    /**
+     * 現在のページに表示する商品
+     */
+    const paginatedProducts =
+        useMemo(
+            () => {
+                const startIndex =
+                    (currentPage - 1)
+                    * ITEMS_PER_PAGE;
+
+                const endIndex =
+                    startIndex
+                    + ITEMS_PER_PAGE;
+
+                return products.slice(
+                    startIndex,
+                    endIndex,
+                );
+            },
+            [
+                products,
+                currentPage,
+            ],
+        );
 
 
     return (
@@ -177,6 +225,7 @@ export const ProductList = () => {
                         || selectedCategoryUuid === ""
                     }
                     onClick={() => {
+                        setCurrentPage(1);
                         void findByCategory(
                             "",
                         );
@@ -225,7 +274,7 @@ export const ProductList = () => {
                 sm:grid-cols-2
                 lg:grid-cols-3
             ">
-                {products.map(
+                {paginatedProducts.map(
                     (product) => (
                         <article
                             key={
@@ -244,12 +293,12 @@ export const ProductList = () => {
                             "
                         >
                             <div className="
-    relative
-    h-48
-    w-full
-    overflow-hidden
-    bg-gray-50
-">
+                                relative
+                                h-48
+                                w-full
+                                overflow-hidden
+                                bg-gray-50
+                            ">
                                 {product.imageUrl ? (
                                     <Image
                                         src={product.imageUrl}
@@ -336,8 +385,106 @@ export const ProductList = () => {
                             </div>
                         </article>
                     ),
+
                 )}
+
             </div>
+            {products.length > 0 && (
+                <div className="
+        mt-10
+        flex
+        flex-wrap
+        items-center
+        justify-center
+        gap-2
+    ">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        disabled={
+                            isPageLoading
+                            || currentPage === 1
+                        }
+                        onClick={() => {
+                            setCurrentPage(
+                                (page) =>
+                                    Math.max(
+                                        1,
+                                        page - 1,
+                                    ),
+                            );
+                        }}
+                    >
+                        前へ
+                    </Button>
+
+                    {Array.from(
+                        {
+                            length:
+                                totalPages,
+                        },
+                        (
+                            _,
+                            index,
+                        ) => index + 1,
+                    ).map(
+                        (pageNumber) => (
+                            <Button
+                                key={
+                                    pageNumber
+                                }
+                                type="button"
+                                variant={
+                                    currentPage
+                                        === pageNumber
+                                        ? "default"
+                                        : "outline"
+                                }
+                                className={
+                                    currentPage
+                                        === pageNumber
+                                        ? "bg-green-900 hover:bg-green-800"
+                                        : ""
+                                }
+                                disabled={
+                                    isPageLoading
+                                }
+                                onClick={() => {
+                                    setCurrentPage(
+                                        pageNumber,
+                                    );
+                                }}
+                            >
+                                {pageNumber}
+                            </Button>
+                        ),
+                    )}
+
+                    <Button
+                        type="button"
+                        variant="outline"
+                        disabled={
+                            isPageLoading
+                            || currentPage
+                            === totalPages
+                        }
+                        onClick={() => {
+                            setCurrentPage(
+                                (page) =>
+                                    Math.min(
+                                        totalPages,
+                                        page + 1,
+                                    ),
+                            );
+                        }}
+                    >
+                        次へ
+                    </Button>
+                </div>
+            )}
+
         </div>
+
+
     );
 };
