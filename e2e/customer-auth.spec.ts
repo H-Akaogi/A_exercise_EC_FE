@@ -18,6 +18,9 @@ const ACCESS_TOKEN =
 const EXPIRES_AT =
     "2099-07-27T12:30:00.000Z";
 
+const USERNAME =
+    "customerE2E";
+
 const LOGIN_REQUEST = {
     mailAddress:
         "customer.e2e@example.com",
@@ -30,20 +33,14 @@ const CART_ITEMS = [
         product: {
             productUuid:
                 "10000000-0000-0000-0000-000000000001",
-            name:
+            productName:
                 "E2Eテスト商品",
             price:
                 100,
-            imageUrl:
-                null,
-            productCategory:
-                null,
-            productStock: {
-                quantity:
-                    10,
-            },
-            deleteFlg:
-                0,
+            productImage:
+                "",
+            stockQuantity:
+                10,
         },
         quantity:
             2,
@@ -371,6 +368,182 @@ test.describe(
                 expect(
                     savedSession,
                 ).toBeNull();
+            },
+        );
+
+        test(
+            "購入確定へJWTを付け、401後もカートを保持する",
+            async ({
+                page,
+            }) => {
+                let purchaseAuthorization:
+                    string | undefined;
+
+                await page.addInitScript(
+                    ({
+                        authStorageKey,
+                        accessToken,
+                        expiresAt,
+                        username,
+                        cartStorageKey,
+                        cartItems,
+                    }) => {
+                        window.sessionStorage
+                            .setItem(
+                                authStorageKey,
+                                JSON.stringify({
+                                    accessToken,
+                                    expiresAt,
+                                    username,
+                                }),
+                            );
+                        window.localStorage
+                            .setItem(
+                                cartStorageKey,
+                                JSON.stringify(
+                                    cartItems,
+                                ),
+                            );
+                    },
+                    {
+                        authStorageKey:
+                            AUTH_STORAGE_KEY,
+                        accessToken:
+                            ACCESS_TOKEN,
+                        expiresAt:
+                            EXPIRES_AT,
+                        username:
+                            USERNAME,
+                        cartStorageKey:
+                            CART_STORAGE_KEY,
+                        cartItems:
+                            CART_ITEMS,
+                    },
+                );
+
+                await page.route(
+                    "**/proxy-api/payment-method/options",
+                    async (route) => {
+                        await route.fulfill({
+                            status:
+                                200,
+                            contentType:
+                                "application/json",
+                            body:
+                                JSON.stringify([
+                                    {
+                                        value:
+                                            "1",
+                                        label:
+                                            "銀行振込",
+                                    },
+                                ]),
+                        });
+                    },
+                );
+
+                await page.route(
+                    "**/proxy-api/purchase/complete",
+                    async (route) => {
+                        purchaseAuthorization =
+                            route.request()
+                                .headers()
+                                .authorization;
+
+                        await route.fulfill({
+                            status:
+                                401,
+                            contentType:
+                                "application/json",
+                            body:
+                                "{}",
+                        });
+                    },
+                );
+
+                await page.goto(
+                    `${BASE_URL}/purchase`,
+                );
+
+                await page
+                    .getByLabel(
+                        "支払い方法",
+                    )
+                    .selectOption(
+                        "1",
+                    );
+                await page
+                    .getByRole(
+                        "button",
+                        {
+                            name:
+                                "購入を確定する",
+                        },
+                    )
+                    .click();
+                await page
+                    .getByRole(
+                        "button",
+                        {
+                            name:
+                                "購入する",
+                            exact:
+                                true,
+                        },
+                    )
+                    .click();
+
+                await expect(
+                    page,
+                ).toHaveURL(
+                    `${BASE_URL}/login`,
+                );
+                expect(
+                    purchaseAuthorization,
+                ).toBe(
+                    `Bearer ${ACCESS_TOKEN}`,
+                );
+
+                const storageAfterUnauthorized =
+                    await page.evaluate(
+                        ({
+                            authStorageKey,
+                            cartStorageKey,
+                        }) => ({
+                            authSession:
+                                window
+                                    .sessionStorage
+                                    .getItem(
+                                        authStorageKey,
+                                    ),
+                            cart:
+                                window
+                                    .localStorage
+                                    .getItem(
+                                        cartStorageKey,
+                                    ),
+                        }),
+                        {
+                            authStorageKey:
+                                AUTH_STORAGE_KEY,
+                            cartStorageKey:
+                                CART_STORAGE_KEY,
+                        },
+                    );
+
+                expect(
+                    storageAfterUnauthorized
+                        .authSession,
+                ).toBeNull();
+                expect(
+                    JSON.parse(
+                        storageAfterUnauthorized
+                            .cart
+                        ?? "null",
+                    ),
+                ).toEqual(
+                    CART_ITEMS,
+                );
             },
         );
     },

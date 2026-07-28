@@ -1,5 +1,12 @@
-import { injectable } from "inversify";
+import {
+    inject,
+    injectable,
+} from "inversify";
 
+import { TYPES } from "@/di/types";
+import type {
+    ICustomerAuthService,
+} from "@/interfaces/ICustomerAuthService";
 import type { IProductRepository } from "../interfaces/IProductRepository";
 import type { Product } from "../models/Product";
 import { ProductDetail } from "@/models/ProductDetail";
@@ -11,6 +18,13 @@ import { ProductDetail } from "@/models/ProductDetail";
 @injectable()
 export class ProductRepository
     implements IProductRepository {
+    constructor(
+        @inject(
+            TYPES.ICustomerAuthService,
+        )
+        private readonly customerAuthService:
+            ICustomerAuthService,
+    ) { }
 
     /**
  * 商品を検索する
@@ -182,6 +196,19 @@ export class ProductRepository
             );
         }
 
+        const accessToken =
+            this.customerAuthService
+                .getAccessToken();
+
+        if (!accessToken) {
+            this.customerAuthService
+                .clearAuthentication();
+
+            throw new Error(
+                "購入するにはログインが必要です。",
+            );
+        }
+
         const requestBody = {
             paymentMethodId,
             items: items.map(
@@ -204,6 +231,8 @@ export class ProductRepository
                             "application/json",
                         Accept:
                             "application/json",
+                        Authorization:
+                            `Bearer ${accessToken}`,
                     },
                     credentials:
                         "include",
@@ -214,6 +243,9 @@ export class ProductRepository
             );
 
         if (response.status === 401) {
+            this.customerAuthService
+                .clearAuthentication();
+
             throw new Error(
                 "購入するにはログインが必要です。",
             );

@@ -14,6 +14,9 @@ import type { IPurchaseProductService } from "@/interfaces/IPurchaseProductServi
 import {
     usePaymentMethod,
 } from "@/components/hooks/usePaymentMethod";
+import {
+    useCustomerAuth,
+} from "@/components/hooks/useCustomerAuth";
 
 import { useCart } from "@/contexts/CartContext";
 
@@ -41,6 +44,12 @@ import {
 
 export const CartPage = () => {
     const router = useRouter();
+
+    const {
+        isAuthenticated,
+        isInitialized:
+        isAuthenticationInitialized,
+    } = useCustomerAuth();
 
     const {
         paymentMethods,
@@ -458,8 +467,17 @@ export const CartPage = () => {
                                 "
                                 disabled={
                                     isLoading
+                                    || !isAuthenticationInitialized
                                 }
                                 onClick={() => {
+                                    if (!isAuthenticated) {
+                                        router.replace(
+                                            "/login",
+                                        );
+
+                                        return;
+                                    }
+
                                     setIsConfirmOpen(
                                         true,
                                     );
