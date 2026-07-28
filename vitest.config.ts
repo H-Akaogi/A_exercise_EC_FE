@@ -31,7 +31,7 @@ export default defineConfig({
 
                 "infrastructures/CustomerRepository.ts",
                 "infrastructures/ProductCategoryRepository.ts",
-                "infrastructures/OrdersRepository.ts",
+                "infrastructures/OrderRepository.ts",
                 "infrastructures/ProductRepository.ts",
                 "infrastructures/PaymentMethodRepository.ts",
 
