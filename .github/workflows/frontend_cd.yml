@@ -1,0 +1,481 @@
+name: EC Frontend CD
+
+on:
+  workflow_run:
+    workflows:
+      - "EC Frontend CI"
+    types:
+      - completed
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "TrainingServerへ実際にデプロイする"
+        required: true
+        type: boolean
+        default: false
+
+concurrency:
+  group: ec-frontend-cd
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  # 管理フロントとは別の場所へ配置する
+  DEPLOY_DIR: /var/www/fullness-ec-web
+
+  # 管理フロントとは別のsystemdサービス名
+  SERVICE_NAME: fullness-ec-web
+
+  # 顧客フロント専用の環境変数ファイル
+  ENV_FILE: /etc/fullness/ec-web.env
+
+  # 管理フロントは3000番なので、
+  # 顧客フロントは3001番を使用する
+  APP_PORT: "3001"
+
+  # TrainingServer内部の顧客バックエンドへ接続する
+  API_BASE_URL: http://127.0.0.1:5100
+
+jobs:
+  build-and-package:
+    name: ビルドと成果物作成
+    runs-on: ubuntu-latest
+
+    # 手動実行では常にビルドする。
+    #
+    # CI完了後の自動実行では、
+    # CI成功かつデプロイ許可変数がtrueの場合だけ実行する。
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'workflow_run' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        vars.EC_FRONTEND_DEPLOY_ENABLED == 'true'
+      )
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          # CIが確認したものと同じコミットを
+          # チェックアウトする
+          ref: >-
+            ${{ github.event_name == 'workflow_run'
+            && github.event.workflow_run.head_sha
+            || github.sha }}
+
+      - name: Node.jsをセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: 依存関係をインストール
+        run: npm ci
+
+      - name: Next.jsをビルド
+        run: npm run build
+        env:
+          # API_BASE_URLは上のworkflow envから引き継ぐ
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          AUTH_TRUST_HOST: "true"
+
+      - name: standalone成果物を確認
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f .next/standalone/server.js
+          test -d .next/standalone/.next
+          test -f .next/standalone/.next/BUILD_ID
+
+          echo "standalone成果物を確認しました"
+
+      - name: 成果物をまとめる
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf web-publish
+          mkdir -p web-publish
+
+          # standaloneの本体をコピー
+          cp -a \
+            .next/standalone/. \
+            web-publish/
+
+          # standaloneには自動で含まれない
+          # 静的ファイルを追加する
+          mkdir -p web-publish/.next
+
+          cp -a \
+            .next/static \
+            web-publish/.next/static
+
+          # publicが存在する場合だけ追加する
+          if [ -d public ]; then
+            cp -a \
+              public \
+              web-publish/public
+          fi
+
+      - name: 成果物を圧縮
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tar \
+            -C web-publish \
+            -czf ec-frontend-standalone.tar.gz \
+            .
+
+          test -f ec-frontend-standalone.tar.gz
+
+      - name: 成果物を保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: ec-frontend-standalone
+          path: ec-frontend-standalone.tar.gz
+          retention-days: 1
+          if-no-files-found: error
+
+  deploy:
+    name: TrainingServerへデプロイ
+    needs:
+      - build-and-package
+    runs-on: ubuntu-latest
+
+    # 実際のデプロイは、
+    # Repository Variableがtrueの場合だけ許可する。
+    #
+    # 手動実行ではdeployへのチェックも必要。
+    if: >-
+      vars.EC_FRONTEND_DEPLOY_ENABLED == 'true' &&
+      (
+        github.event_name == 'workflow_run' ||
+        (
+          github.event_name == 'workflow_dispatch' &&
+          inputs.deploy == true
+        )
+      )
+
+    steps:
+      - name: 成果物を取得
+        uses: actions/download-artifact@v4
+        with:
+          name: ec-frontend-standalone
+          path: artifact
+
+      - name: 成果物を展開して確認
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf web-publish
+          mkdir -p web-publish
+
+          tar \
+            -xzf artifact/ec-frontend-standalone.tar.gz \
+            -C web-publish
+
+          test -f web-publish/server.js
+          test -d web-publish/.next
+          test -f web-publish/.next/BUILD_ID
+
+          echo "デプロイ成果物を確認しました"
+
+      - name: SSH鍵を準備
+        shell: bash
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.TRAININGSERVER_KEY }}
+          VM_HOST: ${{ secrets.AZURE_HOST }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SSH_PRIVATE_KEY}" ]; then
+            echo "::error::TRAININGSERVER_KEYが未登録です"
+            exit 1
+          fi
+
+          if [ -z "${VM_HOST}" ]; then
+            echo "::error::AZURE_HOSTが未登録です"
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+
+          printf '%s' "${SSH_PRIVATE_KEY}" \
+            | tr -d '\r' \
+            > ~/.ssh/deploy_key
+
+          chmod 600 ~/.ssh/deploy_key
+
+          ssh-keyscan \
+            -H \
+            "${VM_HOST}" \
+            >> ~/.ssh/known_hosts
+
+      - name: SSH接続を確認
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.AZURE_HOST }}
+          VM_USER: ${{ secrets.AZURE_USER }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${VM_USER}" ]; then
+            echo "::error::AZURE_USERが未登録です"
+            exit 1
+          fi
+
+          ssh \
+            -i ~/.ssh/deploy_key \
+            "${VM_USER}@${VM_HOST}" \
+            "echo 'SSH connection successful';
+             hostname;
+             whoami"
+
+      - name: 本番環境変数ファイルを作成
+        shell: bash
+        env:
+          AUTH_SECRET_VALUE: ${{ secrets.AUTH_SECRET }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${AUTH_SECRET_VALUE}" ]; then
+            echo "::error::AUTH_SECRETが未登録です"
+            exit 1
+          fi
+
+          umask 077
+
+          {
+            printf '%s\n' \
+              'NODE_ENV=production' \
+              'PORT=${{ env.APP_PORT }}' \
+              'HOSTNAME=127.0.0.1' \
+              'API_BASE_URL=${{ env.API_BASE_URL }}' \
+              'AUTH_TRUST_HOST=true'
+
+            printf 'AUTH_SECRET=%s\n' \
+              "${AUTH_SECRET_VALUE}"
+          } > ec-web.env
+
+          echo "本番環境変数ファイルを作成しました"
+
+      - name: VMの一時配置場所を準備
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.AZURE_HOST }}
+          VM_USER: ${{ secrets.AZURE_USER }}
+        run: |
+          set -euo pipefail
+
+          ssh \
+            -i ~/.ssh/deploy_key \
+            "${VM_USER}@${VM_HOST}" \
+            "rm -rf /tmp/fullness-ec-web-publish &&
+             mkdir -p /tmp/fullness-ec-web-publish &&
+             rm -f /tmp/fullness-ec-web.env"
+
+      - name: 成果物を転送
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.AZURE_HOST }}
+          VM_USER: ${{ secrets.AZURE_USER }}
+        run: |
+          set -euo pipefail
+
+          rsync \
+            -az \
+            --delete \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            web-publish/ \
+            "${VM_USER}@${VM_HOST}:/tmp/fullness-ec-web-publish/"
+
+      - name: 環境変数ファイルを転送
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.AZURE_HOST }}
+          VM_USER: ${{ secrets.AZURE_USER }}
+        run: |
+          set -euo pipefail
+
+          scp \
+            -i ~/.ssh/deploy_key \
+            ec-web.env \
+            "${VM_USER}@${VM_HOST}:/tmp/fullness-ec-web.env"
+
+      - name: 配置してsystemdサービスを起動
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.AZURE_HOST }}
+          VM_USER: ${{ secrets.AZURE_USER }}
+        run: |
+          set -euo pipefail
+
+          ssh \
+            -i ~/.ssh/deploy_key \
+            "${VM_USER}@${VM_HOST}" \
+            "DEPLOY_DIR='${DEPLOY_DIR}' \
+             SERVICE_NAME='${SERVICE_NAME}' \
+             ENV_FILE='${ENV_FILE}' \
+             APP_PORT='${APP_PORT}' \
+             bash -s" <<'REMOTE_SCRIPT'
+          set -euo pipefail
+
+          if ! id fullness > /dev/null 2>&1; then
+            echo "fullnessユーザーが見つかりません"
+            exit 1
+          fi
+
+          NODE_PATH="$(command -v node)"
+
+          if [ -z "${NODE_PATH}" ]; then
+            echo "nodeコマンドが見つかりません"
+            exit 1
+          fi
+
+          echo "ホスト名: $(hostname)"
+          echo "Node.js: ${NODE_PATH}"
+          echo "配置先: ${DEPLOY_DIR}"
+          echo "ポート: ${APP_PORT}"
+
+          # 配置先ディレクトリを作成
+          sudo install \
+            -d \
+            -o fullness \
+            -g fullness \
+            -m 755 \
+            "${DEPLOY_DIR}"
+
+          # 環境変数ファイル用ディレクトリを作成
+          sudo install \
+            -d \
+            -o root \
+            -g fullness \
+            -m 750 \
+            "$(dirname "${ENV_FILE}")"
+
+          # 環境変数ファイルを配置
+          sudo install \
+            -o root \
+            -g fullness \
+            -m 640 \
+            /tmp/fullness-ec-web.env \
+            "${ENV_FILE}"
+
+          # Next.js成果物を配置
+          sudo rsync \
+            -a \
+            --delete \
+            /tmp/fullness-ec-web-publish/ \
+            "${DEPLOY_DIR}/"
+
+          sudo chown \
+            -R \
+            fullness:fullness \
+            "${DEPLOY_DIR}"
+
+          # 顧客フロント用systemdサービスを作成
+          temporary_service_file="$(mktemp)"
+
+          cat > "${temporary_service_file}" <<EOF
+          [Unit]
+          Description=A_exercise EC Customer Frontend
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          Type=simple
+          User=fullness
+          Group=fullness
+
+          WorkingDirectory=${DEPLOY_DIR}
+
+          ExecStart=${NODE_PATH} ${DEPLOY_DIR}/server.js
+
+          EnvironmentFile=${ENV_FILE}
+
+          Restart=on-failure
+          RestartSec=5
+
+          KillSignal=SIGTERM
+          TimeoutStopSec=30
+
+          SyslogIdentifier=fullness-ec-web
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+          sudo install \
+            -o root \
+            -g root \
+            -m 644 \
+            "${temporary_service_file}" \
+            "/etc/systemd/system/${SERVICE_NAME}.service"
+
+          rm -f "${temporary_service_file}"
+
+          # VM上の一時ファイルを削除
+          rm -rf /tmp/fullness-ec-web-publish
+          rm -f /tmp/fullness-ec-web.env
+
+          # systemdへ反映
+          sudo systemctl daemon-reload
+
+          sudo systemctl enable \
+            "${SERVICE_NAME}.service"
+
+          sudo systemctl restart \
+            "${SERVICE_NAME}.service"
+
+          # 最大30秒間、起動完了を確認する
+          for attempt in $(seq 1 15); do
+            if sudo systemctl is-active \
+                 --quiet \
+                 "${SERVICE_NAME}.service" &&
+               curl \
+                 --fail \
+                 --silent \
+                 --show-error \
+                 --output /dev/null \
+                 "http://127.0.0.1:${APP_PORT}/"; then
+              echo "顧客フロントエンドの起動確認に成功しました"
+              exit 0
+            fi
+
+            echo "起動確認中: ${attempt}/15"
+            sleep 2
+          done
+
+          echo "顧客フロントエンドの起動確認に失敗しました"
+
+          sudo systemctl status \
+            "${SERVICE_NAME}.service" \
+            --no-pager \
+            --full \
+            || true
+
+          sudo journalctl \
+            -u "${SERVICE_NAME}.service" \
+            -n 100 \
+            --no-pager \
+            || true
+
+          exit 1
+          REMOTE_SCRIPT
+
+      - name: ローカル一時ファイルを削除
+        if: always()
+        shell: bash
+        run: |
+          rm -f ec-web.env
+          rm -f ~/.ssh/deploy_key
