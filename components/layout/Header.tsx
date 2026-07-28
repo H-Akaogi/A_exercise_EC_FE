@@ -4,7 +4,13 @@ import {
     ShoppingCart,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+    useState,
+} from "react";
 
+import {
+    useCustomerAuth,
+} from "@/components/hooks/useCustomerAuth";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 
@@ -14,6 +20,37 @@ export const Header = () => {
     const {
         totalQuantity,
     } = useCart();
+
+    const {
+        isAuthenticated,
+        logout,
+    } = useCustomerAuth();
+
+    const [
+        isLoggingOut,
+        setIsLoggingOut,
+    ] = useState<boolean>(false);
+
+    const handleLogout =
+        async (): Promise<void> => {
+            if (isLoggingOut) {
+                return;
+            }
+
+            setIsLoggingOut(true);
+
+            try {
+                await logout();
+            } catch {
+                /*
+                 * バックエンドはステートレスJWTのため、
+                 * APIが失敗してもContext側で認証情報を破棄する。
+                 */
+            } finally {
+                setIsLoggingOut(false);
+                router.replace("/login");
+            }
+        };
 
     return (
         <header className="
@@ -88,35 +125,78 @@ export const Header = () => {
                         商品検索
                     </button>
 
-                    <button
-                        type="button"
-                        className="
-                            text-gray-600
-                            hover:underline
-                        "
-                        onClick={() => {
-                            router.push(
-                                "/account",
-                            );
-                        }}
-                    >
-                        アカウント登録
-                    </button>
+                    {isAuthenticated
+                        ? (
+                            <>
+                                <button
+                                    type="button"
+                                    className="
+                                        text-gray-600
+                                        hover:underline
+                                    "
+                                    onClick={() => {
+                                        router.push(
+                                            "/purchase/history",
+                                        );
+                                    }}
+                                >
+                                    購入履歴
+                                </button>
 
-                    <button
-                        type="button"
-                        className="
-                            text-gray-600
-                            hover:underline
-                        "
-                        onClick={() => {
-                            router.push(
-                                "/login",
-                            );
-                        }}
-                    >
-                        ログイン
-                    </button>
+                                <button
+                                    type="button"
+                                    className="
+                                        text-gray-600
+                                        hover:underline
+                                        disabled:cursor-not-allowed
+                                        disabled:opacity-60
+                                    "
+                                    disabled={
+                                        isLoggingOut
+                                    }
+                                    onClick={() => {
+                                        void handleLogout();
+                                    }}
+                                >
+                                    {isLoggingOut
+                                        ? "ログアウト中"
+                                        : "ログアウト"}
+                                </button>
+                            </>
+                        )
+                        : (
+                            <>
+                                <button
+                                    type="button"
+                                    className="
+                                        text-gray-600
+                                        hover:underline
+                                    "
+                                    onClick={() => {
+                                        router.push(
+                                            "/account",
+                                        );
+                                    }}
+                                >
+                                    アカウント登録
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="
+                                        text-gray-600
+                                        hover:underline
+                                    "
+                                    onClick={() => {
+                                        router.push(
+                                            "/login",
+                                        );
+                                    }}
+                                >
+                                    ログイン
+                                </button>
+                            </>
+                        )}
 
                     <Button
                         type="button"

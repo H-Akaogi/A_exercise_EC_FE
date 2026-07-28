@@ -28,6 +28,24 @@ const nextConfig: NextConfig = {
     return [
       {
         /**
+         * UC002 顧客ログインAPI
+         */
+        source:
+          "/proxy-api/login",
+        destination:
+          `${apiBaseUrl}/login`,
+      },
+      {
+        /**
+         * UC008 顧客ログアウトAPI
+         */
+        source:
+          "/proxy-api/logout",
+        destination:
+          `${apiBaseUrl}/logout`,
+      },
+      {
+        /**
          * 顧客アカウント登録API
          */
         source:

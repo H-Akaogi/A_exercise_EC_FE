@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CartProvider } from "@/contexts/CartContext";
+import { CustomerAuthProvider } from "@/contexts/CustomerAuthContext";
 import { Header } from "@/components/layout/Header";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -31,11 +32,13 @@ export default function RootLayout({
     <html lang="ja">
       <body>
         <CartProvider>
-          <Header />
+          <CustomerAuthProvider>
+            <Header />
 
-          <main>
-            {children}
-          </main>
+            <main>
+              {children}
+            </main>
+          </CustomerAuthProvider>
         </CartProvider>
       </body>
     </html>

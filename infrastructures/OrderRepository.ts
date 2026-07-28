@@ -1,6 +1,13 @@
 import {
+    inject,
     injectable,
 } from "inversify";
+
+import { TYPES } from "@/di/types";
+
+import type {
+    ICustomerAuthService,
+} from "@/interfaces/ICustomerAuthService";
 
 import type {
     IOrderRepository,
@@ -20,6 +27,14 @@ import type {
 @injectable()
 export class OrderRepository
     implements IOrderRepository {
+    constructor(
+        @inject(
+            TYPES.ICustomerAuthService,
+        )
+        private readonly customerAuthService:
+            ICustomerAuthService,
+    ) { }
+
     /**
      * ログイン中の顧客の購入履歴を取得する
      *
@@ -35,10 +50,8 @@ export class OrderRepository
                 url,
                 {
                     method: "GET",
-                    headers: {
-                        Accept:
-                            "application/json",
-                    },
+                    headers:
+                        this.createHeaders(),
                     credentials:
                         "include",
                     cache:
@@ -50,6 +63,9 @@ export class OrderRepository
          * 未ログインまたは認証期限切れ。
          */
         if (response.status === 401) {
+            this.customerAuthService
+                .clearAuthentication();
+
             throw new Error(
                 "購入履歴を確認するにはログインが必要です",
             );
@@ -162,9 +178,8 @@ export class OrderRepository
                 url,
                 {
                     method: "GET",
-                    headers: {
-                        Accept: "application/json",
-                    },
+                    headers:
+                        this.createHeaders(),
                     credentials: "include",
                     cache: "no-store",
                 },
@@ -174,6 +189,9 @@ export class OrderRepository
          * 未ログインまたは認証期限切れ。
          */
         if (response.status === 401) {
+            this.customerAuthService
+                .clearAuthentication();
+
             throw new Error(
                 "購入履歴の詳細を確認するにはログインが必要です",
             );
@@ -346,5 +364,28 @@ export class OrderRepository
                     }),
                 ),
         };
+    }
+
+    /**
+     * 有効な顧客JWTがある場合のみBearerヘッダーを付与する。
+     */
+    private createHeaders():
+        Record<string, string> {
+        const accessToken =
+            this.customerAuthService
+                .getAccessToken();
+
+        const headers:
+            Record<string, string> = {
+                Accept:
+                    "application/json",
+            };
+
+        if (accessToken) {
+            headers.Authorization =
+                `Bearer ${accessToken}`;
+        }
+
+        return headers;
     }
 }

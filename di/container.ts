@@ -20,6 +20,12 @@ import { CustomerRepository } from "@/infrastructures/CustomerRepository";
 import { ICustomerRepository } from "@/interfaces/ICustomerRepository";
 import { ICustomerService } from "@/interfaces/ICustomerService";
 import { CustomerService } from "@/services/CustomerService";
+import { CustomerAuthRepository } from "@/infrastructures/CustomerAuthRepository";
+import { SessionStorageCustomerAuthStore } from "@/infrastructures/SessionStorageCustomerAuthStore";
+import { CustomerAuthService } from "@/services/CustomerAuthService";
+import { ICustomerAuthRepository } from "@/interfaces/ICustomerAuthRepository";
+import { ICustomerAuthSessionStore } from "@/interfaces/ICustomerAuthSessionStore";
+import { ICustomerAuthService } from "@/interfaces/ICustomerAuthService";
 
 /**
  * 演習 6-2 データアクセスとサービスを実装する
@@ -35,12 +41,15 @@ container.bind<IProductCategoryRepository>(TYPES.IProductCategoryRepository).to(
 container.bind<IPaymentMethodRepository>(TYPES.IPaymentMethodRepository).to(PaymentMethodRepository).inSingletonScope();
 container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository).inSingletonScope();
 container.bind<ICustomerRepository>(TYPES.ICustomerRepository).to(CustomerRepository).inSingletonScope();
+container.bind<ICustomerAuthRepository>(TYPES.ICustomerAuthRepository).to(CustomerAuthRepository).inSingletonScope();
+container.bind<ICustomerAuthSessionStore>(TYPES.ICustomerAuthSessionStore).to(SessionStorageCustomerAuthStore).inSingletonScope();
 // サービス(ユースケース)の
 container.bind<IPurchaseProductService>(TYPES.IPurchaseProductService).to(PurchaseProductService);
 container.bind<IProductCategoryService>(TYPES.IProductCategoryService).to(ProductCategoryService);
 container.bind<IPaymentMethodService>(TYPES.IPaymentMethodService).to(PaymentMethodService);
 container.bind<IOrderService>(TYPES.IOrderService).to(OrderService);
 container.bind<ICustomerService>(TYPES.ICustomerService).to(CustomerService);
+container.bind<ICustomerAuthService>(TYPES.ICustomerAuthService).to(CustomerAuthService).inSingletonScope();
 
 
 export { container };
