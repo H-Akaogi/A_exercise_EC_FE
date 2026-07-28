@@ -1,0 +1,212 @@
+# ============================================================
+# 顧客システム フロントエンド CI
+#
+# 【要点】
+# - パッケージ管理はnpmを使用する
+# - Auth.jsを使用するためAUTH_SECRETを渡す
+# - E2E実行時はAUTH_TRUST_HOST=trueを設定する
+# - GitHub ActionsからはTrainingServer内部の
+#   127.0.0.1:5100へ直接接続できない
+# - CIではNginx経由の公開済み顧客APIへ接続する
+# - フロントエンドからDBへ直接接続しない
+# ============================================================
+
+name: EC Frontend CI
+
+on:
+  # devへのpushでCIを事前確認し、
+  # main反映後にも再実行する
+  push:
+    branches:
+      - dev
+      - main
+
+  # mainへのPull Requestでも実行する
+  pull_request:
+    branches:
+      - main
+
+  # GitHub Actions画面から手動実行できる
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# 同じブランチで新しいCIが始まった場合、
+# 古いCIを中止する
+concurrency:
+  group: ec-frontend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: ビルドとテスト
+    runs-on: ubuntu-latest
+
+    env:
+      # テストをCIモードで実行する
+      CI: true
+
+      # Next.jsのテレメトリを無効にする
+      NEXT_TELEMETRY_DISABLED: 1
+
+      # CIのNext.jsから接続する顧客バックエンド
+      #
+      # GitHub ActionsはTrainingServerの外部で動くため、
+      # 本番内部用のhttp://127.0.0.1:5100ではなく、
+      # Nginx経由で公開済みのURLを使用する
+      API_BASE_URL: >-
+        https://fullness-stationery.japaneast.cloudapp.azure.com/ec-api
+
+    steps:
+      # GitHub上のソースコードをRunnerへ取得する
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      # Node.js 22を準備し、
+      # package-lock.jsonを基準にnpmキャッシュを使用する
+      - name: Node.jsをセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      # CI実行前に必要なファイルを確認する
+      - name: プロジェクト構成を確認
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "現在の作業ディレクトリ:"
+          pwd
+
+          if [ ! -f package.json ]; then
+            echo "::error::package.jsonが見つかりません"
+            exit 1
+          fi
+
+          if [ ! -f package-lock.json ]; then
+            echo "::error::package-lock.jsonが見つかりません"
+            exit 1
+          fi
+
+          echo "Node.js:"
+          node --version
+
+          echo "npm:"
+          npm --version
+
+          echo "package.json:"
+          realpath package.json
+
+          echo "package-lock.json:"
+          realpath package-lock.json
+
+      # package-lock.jsonの内容どおりに
+      # 依存パッケージをインストールする
+      - name: 依存関係をインストール
+        run: |
+          npm ci
+
+      # ESLintなどの静的解析を実行する
+      - name: 静的解析
+        run: |
+          npm run lint
+
+      # Vitestなどの単体テストを実行する
+      - name: 単体テスト
+        run: |
+          npm run test
+
+      # Next.jsを本番構成でビルドする
+      #
+      # next.config.tsでは、ジョブenvに設定した
+      # API_BASE_URLが使用される
+      #
+      # Auth.jsが必要とするAUTH_SECRETも渡す
+      - name: ビルド
+        run: |
+          npm run build
+        env:
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+
+      # E2Eで使用するChromiumと
+      # Linux側の依存パッケージをインストールする
+      - name: Playwrightのブラウザをインストール
+        run: |
+          npx playwright install \
+            --with-deps \
+            chromium
+
+      # 公開済みの顧客バックエンドへ、
+      # GitHub Actionsから接続できることを確認する
+      #
+      # ログインAPIはテストユーザーや認証情報に依存するため、
+      # 認証不要のカテゴリ一覧APIを使用する
+      - name: 顧客バックエンド接続確認
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          endpoint="${API_BASE_URL}/product-category/options"
+          response_file="$(mktemp)"
+
+          echo "接続確認先:"
+          echo "${endpoint}"
+
+          http_status="$(
+            curl \
+              --silent \
+              --show-error \
+              --output "${response_file}" \
+              --write-out '%{http_code}' \
+              --connect-timeout 10 \
+              --max-time 30 \
+              "${endpoint}"
+          )"
+
+          echo "HTTPステータス: ${http_status}"
+
+          if [ "${http_status}" -lt 200 ] ||
+             [ "${http_status}" -ge 300 ]; then
+            echo "::error::顧客バックエンドへの接続に失敗しました"
+
+            echo "レスポンス:"
+            cat "${response_file}"
+
+            rm -f "${response_file}"
+            exit 1
+          fi
+
+          echo "顧客バックエンドへの接続に成功しました"
+
+          rm -f "${response_file}"
+
+      # Playwrightの設定に従って
+      # 顧客フロントエンドを起動し、E2Eを実行する
+      #
+      # API_BASE_URLはジョブenvから引き継がれるため、
+      # ローカルのNext.jsから公開済み顧客APIへ接続する
+      - name: E2Eテスト
+        run: |
+          npm run test:e2e
+        env:
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+
+          # Auth.jsをリバースプロキシ環境でも
+          # 正しく動作させる
+          AUTH_TRUST_HOST: true
+
+      # E2E失敗時にHTMLレポート、
+      # スクリーンショット、動画、トレース等を保存する
+      - name: テストレポートを保存
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ec-frontend-playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
