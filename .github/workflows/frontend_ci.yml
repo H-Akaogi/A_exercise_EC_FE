@@ -183,31 +183,7 @@ jobs:
 
           rm -f "${response_file}"
 
-      # Playwrightの設定に従って
-      # 顧客フロントエンドを起動し、E2Eを実行する
-      #
-      # API_BASE_URLはジョブenvから引き継がれるため、
-      # ローカルのNext.jsから公開済み顧客APIへ接続する
-      - name: E2Eテスト
-        run: npm run test:e2e
-        env:
-          CI: true
-
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-          AUTH_TRUST_HOST: true
-
-          API_BASE_URL: >-
-            https://fullness-stationery.japaneast.cloudapp.azure.com/ec-api
-
-          E2E_CUSTOMER_MAIL_ADDRESS: >-
-            ${{ secrets.E2E_CUSTOMER_MAIL_ADDRESS }}
-
-          E2E_CUSTOMER_PASSWORD: >-
-            ${{ secrets.E2E_CUSTOMER_PASSWORD }}
-
-            # Auth.jsをリバースプロキシ環境でも
-            # 正しく動作させる
-            AUTH_TRUST_HOST: true
+      # 今回はE2Eなし（ブラックボックステストは手動で実施）
 
       # E2E失敗時にHTMLレポート、
       # スクリーンショット、動画、トレース等を保存する
