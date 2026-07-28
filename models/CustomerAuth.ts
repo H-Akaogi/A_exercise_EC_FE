@@ -39,6 +39,7 @@ export type CustomerAuthState = {
     isAuthenticated: boolean;
     expiresAt: string | null;
     username?: string | null;
+    sessionExpired?: boolean;
 };
 
 export type CustomerLoginFieldErrors = Partial<

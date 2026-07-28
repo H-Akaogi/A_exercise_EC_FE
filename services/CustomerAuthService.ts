@@ -101,11 +101,23 @@ export class CustomerAuthService
                 .getValidSession();
 
         if (!session) {
-            return {
+            const authState:
+                CustomerAuthState = {
                 isAuthenticated: false,
                 expiresAt: null,
                 username: null,
             };
+
+            if (
+                this.sessionStore
+                    .consumeExpirationDetected
+                    ?.()
+            ) {
+                authState.sessionExpired =
+                    true;
+            }
+
+            return authState;
         }
 
         return {
@@ -120,8 +132,20 @@ export class CustomerAuthService
 
     public getAccessToken():
         string | null {
-        return this.sessionStore
-            .getValidSession()
+        const session =
+            this.sessionStore
+                .getValidSession();
+
+        if (
+            !session
+            && this.sessionStore
+                .consumeExpirationDetected
+                ?.()
+        ) {
+            this.notifyAuthenticationCleared();
+        }
+
+        return session
             ?.accessToken
             ?? null;
     }
@@ -130,6 +154,11 @@ export class CustomerAuthService
         void {
         this.sessionStore.clear();
 
+        this.notifyAuthenticationCleared();
+    }
+
+    private notifyAuthenticationCleared():
+        void {
         for (
             const listener
             of this.authenticationClearedListeners

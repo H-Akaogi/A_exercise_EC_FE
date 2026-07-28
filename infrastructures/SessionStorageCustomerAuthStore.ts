@@ -17,6 +17,9 @@ const STORAGE_KEY =
 @injectable()
 export class SessionStorageCustomerAuthStore
     implements ICustomerAuthSessionStore {
+    private expirationDetected =
+        false;
+
     public save(
         session: CustomerAuthSession,
     ): void {
@@ -45,6 +48,8 @@ export class SessionStorageCustomerAuthStore
                 STORAGE_KEY,
                 JSON.stringify(session),
             );
+            this.expirationDetected =
+                false;
         } catch {
             throw new Error(
                 "認証情報を保存できませんでした。",
@@ -80,16 +85,32 @@ export class SessionStorageCustomerAuthStore
                 !isValidSessionShape(
                     parsedSession,
                 )
-                || isExpired(
+            ) {
+                storage.removeItem(
+                    STORAGE_KEY,
+                );
+                this.expirationDetected =
+                    false;
+
+                return null;
+            }
+
+            if (
+                isExpired(
                     parsedSession,
                 )
             ) {
                 storage.removeItem(
                     STORAGE_KEY,
                 );
+                this.expirationDetected =
+                    true;
 
                 return null;
             }
+
+            this.expirationDetected =
+                false;
 
             return parsedSession;
         } catch {
@@ -101,11 +122,28 @@ export class SessionStorageCustomerAuthStore
                 // storage自体を利用できない場合は未認証として扱う。
             }
 
+            this.expirationDetected =
+                false;
+
             return null;
         }
     }
 
+    public consumeExpirationDetected():
+        boolean {
+        const detected =
+            this.expirationDetected;
+
+        this.expirationDetected =
+            false;
+
+        return detected;
+    }
+
     public clear(): void {
+        this.expirationDetected =
+            false;
+
         const storage =
             getSessionStorage();
 

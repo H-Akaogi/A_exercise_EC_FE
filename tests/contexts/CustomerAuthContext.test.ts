@@ -314,7 +314,7 @@ describe(
         );
 
         it(
-            "expiresAtを迎えたら認証情報を削除して未認証へ切り替える",
+            "expiresAtを迎えても画面表示中は自動的に認証情報を削除しない",
             async () => {
                 vi.useFakeTimers();
                 vi.setSystemTime(
@@ -354,10 +354,10 @@ describe(
                 expect(
                     service
                         .clearAuthentication,
-                ).toHaveBeenCalledOnce();
+                ).not.toHaveBeenCalled();
                 expect(
                     screen.getByText(
-                        "anonymous",
+                        "authenticated",
                     ),
                 ).toBeDefined();
             },

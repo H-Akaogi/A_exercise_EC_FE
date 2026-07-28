@@ -48,9 +48,6 @@ export const CustomerAuthContext =
         undefined,
     );
 
-const MAX_TIMEOUT_MILLISECONDS =
-    2_147_483_647;
-
 const SESSION_EXPIRED_MESSAGE =
     "セッションが切れました。再度ログインしてください";
 
@@ -163,7 +160,21 @@ export const CustomerAuthProvider = ({
                 setExpiresAt(
                     authState.expiresAt,
                 );
-                setSessionMessage(null);
+
+                if (
+                    authState
+                        .sessionExpired
+                ) {
+                    setSessionMessage(
+                        SESSION_EXPIRED_MESSAGE,
+                    );
+                    router.replace(
+                        "/login",
+                    );
+                } else {
+                    setSessionMessage(null);
+                }
+
                 setIsInitialized(true);
             };
 
@@ -172,56 +183,9 @@ export const CustomerAuthProvider = ({
         return () => {
             isCancelled = true;
         };
-    }, [service]);
-
-    /*
-     * 画面を開いたまま有効期限を迎えた場合も、
-     * 期限切れJWTを使い続けない。
-     */
-    useEffect(() => {
-        if (
-            !isAuthenticated
-            || !expiresAt
-        ) {
-            return;
-        }
-
-        const expiresAtMilliseconds =
-            Date.parse(
-                expiresAt,
-            );
-        const remainingMilliseconds =
-            expiresAtMilliseconds
-            - Date.now();
-
-        const timeoutMilliseconds =
-            Number.isFinite(
-                expiresAtMilliseconds,
-            )
-                ? Math.max(
-                    0,
-                    Math.min(
-                        remainingMilliseconds,
-                        MAX_TIMEOUT_MILLISECONDS,
-                    ),
-                )
-                : 0;
-
-        const timerId =
-            window.setTimeout(
-                clearAuthentication,
-                timeoutMilliseconds,
-            );
-
-        return () => {
-            window.clearTimeout(
-                timerId,
-            );
-        };
     }, [
-        clearAuthentication,
-        expiresAt,
-        isAuthenticated,
+        router,
+        service,
     ]);
 
     const login =
