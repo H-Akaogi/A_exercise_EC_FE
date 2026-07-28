@@ -2,10 +2,22 @@
 
 import {
     useEffect,
+    useState,
 } from "react";
 import {
     useRouter,
 } from "next/navigation";
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +30,16 @@ export const CustomerAccountRegister = () => {
     const router =
         useRouter();
 
+    const [
+        isConfirmOpen,
+        setIsConfirmOpen,
+    ] = useState<boolean>(false);
+
+    const [
+        isCompleteOpen,
+        setIsCompleteOpen,
+    ] = useState<boolean>(false);
+
     const {
         title,
         customer,
@@ -27,6 +49,7 @@ export const CustomerAccountRegister = () => {
         completeResult,
         loadForm,
         updateField,
+        validateField,
         submit,
         reset,
     } = useCustomerAccount();
@@ -37,101 +60,35 @@ export const CustomerAccountRegister = () => {
         loadForm,
     ]);
 
-    if (completeResult) {
-        return (
-            <div className="
-        mx-auto
-        max-w-2xl
-        rounded-lg
-        border
-        bg-white
-        p-8
-        shadow-sm
-      ">
-                <h1 className="
-          mb-6
-          text-center
-          text-2xl
-          font-bold
-        ">
-                    {completeResult.title
-                        || "顧客アカウント登録完了"}
-                </h1>
+    /**
+ * 確認モーダルから顧客登録を実行する
+ */
+    /**
+ * 確認モーダルから顧客登録を実行する
+ */
+    const confirmRegister =
+        async (): Promise<void> => {
+            const isSuccess =
+                await submit();
 
-                <p className="
-          mb-6
-          text-center
-          font-semibold
-          text-green-700
-        ">
-                    {completeResult.message
-                        || "顧客アカウントを登録しました"}
-                </p>
+            /*
+             * バリデーションエラーやAPIエラーの場合は、
+             * 確認モーダルを閉じて入力画面へ戻す。
+             */
+            if (!isSuccess) {
+                setIsConfirmOpen(false);
 
-                <div className="
-          mb-8
-          space-y-3
-          rounded-md
-          bg-gray-50
-          p-5
-        ">
-                    <p>
-                        <span className="font-bold">
-                            氏名：
-                        </span>
+                return;
+            }
 
-                        {completeResult.name}
-                    </p>
+            /*
+             * 登録確認モーダルを閉じ、
+             * 登録完了モーダルを表示する。
+             */
+            setIsConfirmOpen(false);
+            setIsCompleteOpen(true);
+        };
 
-                    <p>
-                        <span className="font-bold">
-                            アカウント名：
-                        </span>
-
-                        {completeResult.username}
-                    </p>
-
-                    <p>
-                        <span className="font-bold">
-                            登録日時：
-                        </span>
-
-                        {completeResult.createdAt
-                            ? new Date(
-                                completeResult.createdAt,
-                            ).toLocaleString(
-                                "ja-JP",
-                            )
-                            : "-"}
-                    </p>
-                </div>
-
-                <div className="flex gap-4">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={reset}
-                    >
-                        続けて登録する
-                    </Button>
-
-                    <Button
-                        type="button"
-                        className="
-              flex-1
-              bg-green-900
-            "
-                        onClick={() => {
-                            router.push("/");
-                        }}
-                    >
-                        トップへ戻る
-                    </Button>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="
@@ -169,7 +126,10 @@ export const CustomerAccountRegister = () => {
                 className="space-y-5"
                 onSubmit={(event) => {
                     event.preventDefault();
-                    void submit();
+
+                    setIsConfirmOpen(
+                        true,
+                    );
                 }}
                 noValidate
             >
@@ -184,6 +144,11 @@ export const CustomerAccountRegister = () => {
                         updateField(
                             "name",
                             value,
+                        );
+                    }}
+                    onBlur={() => {
+                        void validateField(
+                            "name",
                         );
                     }}
                 />
@@ -201,12 +166,17 @@ export const CustomerAccountRegister = () => {
                             value,
                         );
                     }}
+                    onBlur={() => {
+                        void validateField(
+                            "kana",
+                        );
+                    }}
                 />
 
                 <FormField
                     id="address1"
                     label="住所1"
-                    placeholder="東京都千代田区永田町"
+                    placeholder="東京都千代田区永田町1-2-3"
                     value={customer.address1}
                     error={fieldErrors.address1}
                     maxLength={100}
@@ -217,12 +187,18 @@ export const CustomerAccountRegister = () => {
                             value,
                         );
                     }}
+                    onBlur={() => {
+                        void validateField(
+                            "address1",
+                        );
+                    }}
+
                 />
 
                 <FormField
                     id="address2"
                     label="住所2"
-                    placeholder="1-2-3 メゾン永田町101"
+                    placeholder="メゾン永田町101"
                     value={
                         customer.address2
                         ?? ""
@@ -233,6 +209,11 @@ export const CustomerAccountRegister = () => {
                         updateField(
                             "address2",
                             value,
+                        );
+                    }}
+                    onBlur={() => {
+                        void validateField(
+                            "address2",
                         );
                     }}
                 />
@@ -252,6 +233,11 @@ export const CustomerAccountRegister = () => {
                             value,
                         );
                     }}
+                    onBlur={() => {
+                        void validateField(
+                            "phoneNumber",
+                        );
+                    }}
                 />
 
                 <FormField
@@ -266,6 +252,11 @@ export const CustomerAccountRegister = () => {
                         updateField(
                             "mailAddress",
                             value,
+                        );
+                    }}
+                    onBlur={() => {
+                        void validateField(
+                            "mailAddress",
                         );
                     }}
                 />
@@ -284,6 +275,11 @@ export const CustomerAccountRegister = () => {
                             value,
                         );
                     }}
+                    onBlur={() => {
+                        void validateField(
+                            "username",
+                        );
+                    }}
                 />
 
                 <FormField
@@ -299,6 +295,11 @@ export const CustomerAccountRegister = () => {
                         updateField(
                             "password",
                             value,
+                        );
+                    }}
+                    onBlur={() => {
+                        void validateField(
+                            "password",
                         );
                     }}
                 />
@@ -329,11 +330,143 @@ export const CustomerAccountRegister = () => {
                         disabled={isLoading}
                     >
                         {isLoading
-                            ? "登録処理中"
-                            : "登録する"}
+                            ? "確認処理中"
+                            : "確認する"}
                     </Button>
                 </div>
             </form>
+            <AlertDialog
+                open={isConfirmOpen}
+                onOpenChange={
+                    setIsConfirmOpen
+                }
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            顧客アカウントを登録しますか？
+                        </AlertDialogTitle>
+
+                        <AlertDialogDescription
+                            className="space-y-2 text-left"
+                        >
+                            入力した内容で顧客アカウントを登録します。
+                            <br />
+
+                            氏名：
+                            {customer.name || "未入力"}
+                            <br />
+
+                            氏名カナ：
+                            {customer.kana || "未入力"}
+                            <br />
+
+                            メールアドレス：
+                            {customer.mailAddress || "未入力"}
+                            <br />
+
+                            アカウント名：
+                            {customer.username || "未入力"}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            disabled={isLoading}
+                        >
+                            入力画面へ戻る
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                            type="button"
+                            className="
+                    bg-green-900
+                    hover:bg-green-800
+                "
+                            disabled={isLoading}
+                            onClick={(event) => {
+                                /*
+                                 * AlertDialogが先に自動で閉じるのを防ぐ。
+                                 */
+                                event.preventDefault();
+
+                                void confirmRegister();
+                            }}
+                        >
+                            {isLoading
+                                ? "登録処理中"
+                                : "登録する"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog
+                open={isCompleteOpen}
+                onOpenChange={() => {
+                    /*
+                     * 背景クリックやEscapeでは閉じない。
+                     * 必ず遷移先を選択してもらう。
+                     */
+                }}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            顧客アカウントの登録が完了しました
+                        </AlertDialogTitle>
+
+                        <AlertDialogDescription
+                            className="
+                    space-y-2
+                    text-left
+                "
+                        >
+                            {completeResult?.message
+                                ?? "顧客アカウントを登録しました。"}
+
+                            <br />
+
+                            氏名：
+                            {completeResult?.name
+                                ?? customer.name}
+
+                            <br />
+
+                            アカウント名：
+                            {completeResult?.username
+                                ?? customer.username}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                                router.push("/");
+                            }}
+                        >
+                            トップへ戻る
+                        </Button>
+
+                        <Button
+                            type="button"
+                            className="
+                    bg-green-900
+                    hover:bg-green-800
+                "
+                            onClick={() => {
+                                router.push(
+                                    "/login",
+                                );
+                            }}
+                        >
+                            ログインする
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
         </div>
     );
 };
@@ -350,6 +483,7 @@ type FormFieldProps = {
     autoComplete?: string;
     onChange:
     (value: string) => void;
+    onBlur?: () => void;
 };
 
 const FormField = ({
@@ -363,6 +497,7 @@ const FormField = ({
     required = false,
     autoComplete,
     onChange,
+    onBlur,
 }: FormFieldProps) => {
     return (
         <div>
@@ -412,6 +547,7 @@ const FormField = ({
                         event.target.value,
                     );
                 }}
+                onBlur={onBlur}
             />
 
             {error && (

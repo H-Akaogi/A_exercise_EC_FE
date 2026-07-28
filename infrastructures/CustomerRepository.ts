@@ -134,7 +134,7 @@ export class CustomerRepository implements ICustomerRepository {
    */
   public async existsByAccountName(accountName: string): Promise<boolean> {
     const params = new URLSearchParams({
-      accountName,
+      username: accountName,
     });
 
     const url = `/proxy-api/account/validate/username?${params.toString()}`;
@@ -200,7 +200,7 @@ export class CustomerRepository implements ICustomerRepository {
    */
   public async existsByMail(mail: string): Promise<boolean> {
     const params = new URLSearchParams({
-      mail,
+      mailAddress: mail,
     });
 
     const url = `/proxy-api/account/validate/mail-address?${params.toString()}`;

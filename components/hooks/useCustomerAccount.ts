@@ -52,6 +52,8 @@ const initialCustomer: Customer = {
     createdAt: "",
 };
 
+
+
 /**
  * 顧客アカウント登録画面のStateと操作を提供するフック
  */
@@ -338,6 +340,214 @@ export const useCustomerAccount = () => {
             [customer],
         );
 
+    type CustomerFieldName =
+        | "name"
+        | "kana"
+        | "address1"
+        | "address2"
+        | "phoneNumber"
+        | "mailAddress"
+        | "username"
+        | "password";
+
+    /**
+ * 指定した項目だけバリデーションする
+ */
+    const validateField =
+        useCallback(
+            async (
+                field: CustomerFieldName,
+            ): Promise<void> => {
+                let message:
+                    string | undefined;
+
+                const accountPattern =
+                    /^[A-Za-z0-9]+$/;
+
+                const kanaPattern =
+                    /^[ァ-ヶー\s]+$/;
+
+                const phonePattern =
+                    /^\d{2,4}-\d{2,4}-\d{4}$/;
+
+                const mailPattern =
+                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                switch (field) {
+                    case "name":
+                        if (!customer.name.trim()) {
+                            message =
+                                "氏名を入力してください";
+                        } else if (
+                            customer.name.length < 2
+                            || customer.name.length > 20
+                        ) {
+                            message =
+                                "氏名は2〜20文字で入力してください";
+                        }
+
+                        break;
+
+                    case "kana":
+                        if (!customer.kana.trim()) {
+                            message =
+                                "氏名カナを入力してください";
+                        } else if (
+                            customer.kana.length < 2
+                            || customer.kana.length > 20
+                        ) {
+                            message =
+                                "氏名カナは2〜20文字で入力してください";
+                        } else if (
+                            !kanaPattern.test(
+                                customer.kana,
+                            )
+                        ) {
+                            message =
+                                "氏名カナは全角カナで入力してください";
+                        }
+
+                        break;
+
+                    case "address1":
+                        if (!customer.address1.trim()) {
+                            message =
+                                "住所1を入力してください";
+                        } else if (
+                            customer.address1.length > 100
+                        ) {
+                            message =
+                                "住所1は100文字以内で入力してください";
+                        }
+
+                        break;
+
+                    case "address2":
+                        if (
+                            customer.address2
+                            && customer.address2.length > 100
+                        ) {
+                            message =
+                                "住所2は100文字以内で入力してください";
+                        }
+
+                        break;
+
+                    case "phoneNumber":
+                        if (!customer.phoneNumber.trim()) {
+                            message =
+                                "電話番号を入力してください";
+                        } else if (
+                            customer.phoneNumber.length > 14
+                            || !phonePattern.test(
+                                customer.phoneNumber,
+                            )
+                        ) {
+                            message =
+                                "電話番号は「XX-XXXX-XXXX」形式で入力してください";
+                        }
+
+                        break;
+
+                    case "mailAddress":
+                        if (!customer.mailAddress.trim()) {
+                            message =
+                                "メールアドレスを入力してください";
+                        } else if (
+                            customer.mailAddress.length < 4
+                            || customer.mailAddress.length > 100
+                        ) {
+                            message =
+                                "メールアドレスは4〜100文字で入力してください";
+                        } else if (
+                            !mailPattern.test(
+                                customer.mailAddress,
+                            )
+                        ) {
+                            message =
+                                "正しいメールアドレス形式で入力してください";
+                        } else {
+                            const exists =
+                                await service.existsByMail(
+                                    customer.mailAddress,
+                                );
+
+                            if (exists) {
+                                message =
+                                    "このメールアドレスは既に登録されています";
+                            }
+                        }
+
+                        break;
+
+                    case "username":
+                        if (!customer.username.trim()) {
+                            message =
+                                "アカウント名を入力してください";
+                        } else if (
+                            customer.username.length < 5
+                            || customer.username.length > 20
+                        ) {
+                            message =
+                                "アカウント名は5〜20文字で入力してください";
+                        } else if (
+                            !accountPattern.test(
+                                customer.username,
+                            )
+                        ) {
+                            message =
+                                "アカウント名は半角英数字で入力してください";
+                        } else {
+                            const exists =
+                                await service
+                                    .existsByAccountName(
+                                        customer.username,
+                                    );
+
+                            if (exists) {
+                                message =
+                                    "このアカウント名は既に使用されています";
+                            }
+                        }
+
+                        break;
+
+                    case "password":
+                        if (!customer.password) {
+                            message =
+                                "パスワードを入力してください";
+                        } else if (
+                            customer.password.length < 5
+                            || customer.password.length > 20
+                        ) {
+                            message =
+                                "パスワードは5〜20文字で入力してください";
+                        } else if (
+                            !accountPattern.test(
+                                customer.password,
+                            )
+                        ) {
+                            message =
+                                "パスワードは半角英数字で入力してください";
+                        }
+
+                        break;
+                }
+
+                setFieldErrors(
+                    (current) => ({
+                        ...current,
+                        [field]:
+                            message,
+                    }),
+                );
+            },
+            [
+                customer,
+                service,
+            ],
+        );
+
     /**
      * 顧客アカウントを登録する
      */
@@ -488,6 +698,7 @@ export const useCustomerAccount = () => {
 
         loadForm,
         updateField,
+        validateField,
         submit,
         reset,
     };
