@@ -56,6 +56,7 @@ test.describe("UC002 顧客ログイン・UC008 顧客ログアウト", () => {
         body: JSON.stringify({
           accessToken: ACCESS_TOKEN,
           expiresAt: EXPIRES_AT,
+          username: USERNAME,
         }),
       });
     });
@@ -96,7 +97,7 @@ test.describe("UC002 顧客ログイン・UC008 顧客ログアウト", () => {
     expect(loginRequest).toEqual(LOGIN_REQUEST);
     await expect(
       page.getByRole("button", {
-        name: "ログアウト",
+        name: `ログアウト（${USERNAME}さん）`,
         exact: true,
       }),
     ).toBeVisible();
@@ -109,11 +110,12 @@ test.describe("UC002 顧客ログイン・UC008 顧客ログアウト", () => {
     expect(JSON.parse(savedSession ?? "null")).toEqual({
       accessToken: ACCESS_TOKEN,
       expiresAt: EXPIRES_AT,
+      username: USERNAME,
     });
 
     await page
       .getByRole("button", {
-        name: "ログアウト",
+        name: `ログアウト（${USERNAME}さん）`,
         exact: true,
       })
       .click();

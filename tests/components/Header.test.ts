@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   isAuthenticated: false,
+  username: "YamadaTaro",
   logout: vi.fn(),
   push: vi.fn(),
   replace: vi.fn(),
@@ -34,6 +35,7 @@ vi.mock("@/components/hooks/useCustomerAuth", () => ({
   useCustomerAuth: () => ({
     isAuthenticated: mocks.isAuthenticated,
     expiresAt: null,
+    username: mocks.username,
     isInitialized: true,
     sessionMessage: null,
     login: vi.fn(),
@@ -48,6 +50,7 @@ import { Header } from "@/components/layout/Header";
 describe("Header", () => {
   beforeEach(() => {
     mocks.isAuthenticated = false;
+    mocks.username = "YamadaTaro";
     mocks.logout.mockReset().mockResolvedValue(undefined);
     mocks.push.mockReset();
     mocks.replace.mockReset();
@@ -72,7 +75,7 @@ describe("Header", () => {
     ).toBeVisible();
     expect(
       screen.queryByRole("button", {
-        name: "ログアウト",
+        name: "ログアウト（YamadaTaroさん）",
       }),
     ).toBeNull();
   });
@@ -89,7 +92,7 @@ describe("Header", () => {
     ).toBeVisible();
     expect(
       screen.getByRole("button", {
-        name: "ログアウト",
+        name: "ログアウト（YamadaTaroさん）",
       }),
     ).toBeVisible();
     expect(
@@ -112,7 +115,7 @@ describe("Header", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: "ログアウト",
+        name: "ログアウト（YamadaTaroさん）",
       }),
     );
 
@@ -129,7 +132,7 @@ describe("Header", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: "ログアウト",
+        name: "ログアウト（YamadaTaroさん）",
       }),
     );
 
