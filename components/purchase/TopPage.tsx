@@ -237,13 +237,21 @@ export const TopPage = () => {
                         lg:grid-cols-4
                     "
           >
-            {products.slice(0, 4).map((product) => {
-              const imageUrl = product.imageUrl ?? "/images/no-image.png";
+            {products
+              .filter((product) => product.productStock!.quantity > 0)
+              .sort(
+                (firstProduct, secondProduct) =>
+                  secondProduct.productStock!.quantity
+                  - firstProduct.productStock!.quantity,
+              )
+              .slice(0, 4)
+              .map((product) => {
+                const imageUrl = product.imageUrl ?? "/images/no-image.png";
 
-              return (
-                <article
-                  key={product.productUuid}
-                  className="
+                return (
+                  <article
+                    key={product.productUuid}
+                    className="
                                                 cursor-pointer
                                                 rounded-lg
                                                 border
@@ -253,51 +261,51 @@ export const TopPage = () => {
                                                 hover:border-gray-200
                                                 hover:shadow-md
                                             "
-                  onClick={() => {
-                    router.push(`/products/detail/${product.productUuid}`);
-                  }}
-                >
-                  <div
-                    className="
+                    onClick={() => {
+                      router.push(`/products/detail/${product.productUuid}`);
+                    }}
+                  >
+                    <div
+                      className="
                                                 relative
                                                 mb-4
                                                 h-48
                                                 w-full
                                             "
-                  >
-                    <Image
-                      src={imageUrl}
-                      alt={product.name}
-                      fill
-                      className="
+                    >
+                      <Image
+                        src={imageUrl}
+                        alt={product.name}
+                        fill
+                        className="
                                                         object-contain
                                                     "
-                    />
-                  </div>
+                      />
+                    </div>
 
-                  <p
-                    className="
+                    <p
+                      className="
                                                 text-sm
                                                 font-semibold
                                                 text-sky-600
                                             "
-                  >
-                    {product.name}
-                  </p>
+                    >
+                      {product.name}
+                    </p>
 
-                  <p
-                    className="
+                    <p
+                      className="
                                                 mt-1
                                                 text-sm
                                                 font-bold
                                                 text-red-500
                                             "
-                  >
-                    {product.price.toLocaleString()}円
-                  </p>
-                </article>
-              );
-            })}
+                    >
+                      {product.price.toLocaleString()}円
+                    </p>
+                  </article>
+                );
+              })}
           </div>
 
           <div
