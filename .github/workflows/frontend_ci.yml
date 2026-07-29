@@ -49,6 +49,7 @@ jobs:
 
       # Next.jsのテレメトリを無効にする
       NEXT_TELEMETRY_DISABLED: 1
+      TZ: Asia/Tokyo
 
       # CIのNext.jsから接続する顧客バックエンド
       #

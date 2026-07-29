@@ -40,6 +40,7 @@ env:
 
   # TrainingServer内部の顧客バックエンドへ接続する
   API_BASE_URL: http://127.0.0.1:5100
+  TZ: Asia/Tokyo
 
 jobs:
   build-and-package:
@@ -260,6 +261,7 @@ jobs:
               'NODE_ENV=production' \
               'PORT=${{ env.APP_PORT }}' \
               'HOSTNAME=127.0.0.1' \
+              'TZ=Asia/Tokyo' \
               'API_BASE_URL=${{ env.API_BASE_URL }}' \
               'AUTH_TRUST_HOST=true'
 
