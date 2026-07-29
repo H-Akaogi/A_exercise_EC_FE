@@ -14,9 +14,9 @@ import { usePurchaseProduct } from "@/components/hooks/usePurchaseProduct";
  * public/images/top/ 配下へ画像を配置してください。
  */
 const carouselImages = [
-  "/images/top/main-01.jpg",
-  "/images/top/main-02.jpg",
-  "/images/top/main-03.jpg",
+  "/images/top/main-01.png",
+  "/images/top/main-02.png",
+  "/images/top/main-03.png",
 ];
 
 export const TopPage = () => {
