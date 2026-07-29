@@ -9,7 +9,7 @@ import { useCustomerAuth } from "@/components/hooks/useCustomerAuth";
 export const Footer = () => {
     const router = useRouter();
 
-    const { isAuthenticated, logout } = useCustomerAuth();
+    const { isAuthenticated, username, logout } = useCustomerAuth();
 
     const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
 
@@ -135,7 +135,9 @@ export const Footer = () => {
 
                                     {isLoggingOut
                                         ? "ログアウト中"
-                                        : "ログアウト"}
+                                        : username
+                                            ? `ログアウト（${username}さん）`
+                                            : "ログアウト（お客様）"}
                                 </button>
                             </>
                         ) : (

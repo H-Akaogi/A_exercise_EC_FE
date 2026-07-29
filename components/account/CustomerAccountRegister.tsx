@@ -100,10 +100,8 @@ export const CustomerAccountRegister = () => {
       mx-auto
       max-w-2xl
       rounded-lg
-      border
       bg-white
       p-8
-      shadow-sm
     "
         >
             <h1
