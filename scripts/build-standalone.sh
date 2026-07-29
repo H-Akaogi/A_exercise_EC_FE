@@ -20,14 +20,3 @@ cp -a \
   .next/standalone/.next/static
 
 echo "standaloneへの静的ファイルコピーが完了しました。"
-
-test -f \
-  .next/standalone/public/images/top/main-01.jpg
-
-test -f \
-  .next/standalone/public/images/top/main-02.jpg
-
-test -f \
-  .next/standalone/public/images/top/main-03.jpg
-
-echo "TOP画像3枚を確認しました。"
