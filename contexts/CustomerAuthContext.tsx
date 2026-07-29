@@ -21,6 +21,7 @@ import type { CustomerLoginRequest } from "@/models/CustomerAuth";
 export type CustomerAuthContextValue = {
   isAuthenticated: boolean;
   expiresAt: string | null;
+  username: string | null;
   isInitialized: boolean;
   sessionMessage: string | null;
   login(request: CustomerLoginRequest): Promise<void>;
@@ -64,6 +65,8 @@ export const CustomerAuthProvider = ({
 
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
 
+  const [username, setUsername] = useState<string | null>(null);
+
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   const [sessionMessage, setSessionMessage] = useState<string | null>(null);
@@ -76,6 +79,7 @@ export const CustomerAuthProvider = ({
     const unsubscribe = service.subscribeToAuthenticationCleared(() => {
       setIsAuthenticated(false);
       setExpiresAt(null);
+      setUsername(null);
       setSessionMessage(SESSION_EXPIRED_MESSAGE);
       router.replace("/login");
     });
@@ -101,6 +105,7 @@ export const CustomerAuthProvider = ({
 
       setIsAuthenticated(authState.isAuthenticated);
       setExpiresAt(authState.expiresAt);
+      setUsername(authState.username ?? null);
 
       if (authState.sessionExpired) {
         setSessionMessage(SESSION_EXPIRED_MESSAGE);
@@ -126,6 +131,7 @@ export const CustomerAuthProvider = ({
       setSessionMessage(null);
       setIsAuthenticated(authState.isAuthenticated);
       setExpiresAt(authState.expiresAt);
+      setUsername(authState.username ?? null);
     },
     [service],
   );
@@ -140,6 +146,7 @@ export const CustomerAuthProvider = ({
        */
       setIsAuthenticated(false);
       setExpiresAt(null);
+      setUsername(null);
       setSessionMessage(null);
     }
   }, [service]);
@@ -153,6 +160,7 @@ export const CustomerAuthProvider = ({
     () => ({
       isAuthenticated,
       expiresAt,
+      username,
       isInitialized,
       sessionMessage,
       login,
@@ -163,6 +171,7 @@ export const CustomerAuthProvider = ({
     [
       isAuthenticated,
       expiresAt,
+      username,
       isInitialized,
       sessionMessage,
       login,

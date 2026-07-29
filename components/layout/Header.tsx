@@ -13,7 +13,7 @@ export const Header = () => {
 
   const { totalQuantity } = useCart();
 
-  const { isAuthenticated, logout } = useCustomerAuth();
+  const { isAuthenticated, username, logout } = useCustomerAuth();
 
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
 
@@ -142,7 +142,11 @@ export const Header = () => {
                   void handleLogout();
                 }}
               >
-                {isLoggingOut ? "ログアウト中" : "ログアウト"}
+                {isLoggingOut
+                  ? "ログアウト中"
+                  : username
+                    ? `ログアウト（${username}さん）`
+                    : "ログアウト（お客様）"}
               </button>
             </>
           ) : (
