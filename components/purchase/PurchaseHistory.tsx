@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -23,6 +28,14 @@ import { usePurchaseHistory } from "@/components/hooks/usePurchaseHistory";
 export const PurchaseHistory = () => {
   const router = useRouter();
 
+  const ITEMS_PER_PAGE = 10;
+
+  const [currentPage, setCurrentPage] =
+    useState<number>(1);
+
+  const purchaseHistoryTopRef =
+    useRef<HTMLDivElement | null>(null);
+
   const { orderList, message, isLoading, errorMessage, findAll } =
     usePurchaseHistory();
 
@@ -30,22 +43,66 @@ export const PurchaseHistory = () => {
     void findAll();
   }, [findAll]);
 
+  /**
+ * 総ページ数
+ */
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      orderList.length / ITEMS_PER_PAGE,
+    ),
+  );
+
+  /**
+ * 現在ページに表示する購入履歴
+ */
+  const paginatedOrderList = useMemo(() => {
+    const startIndex =
+      (currentPage - 1) * ITEMS_PER_PAGE;
+
+    const endIndex =
+      startIndex + ITEMS_PER_PAGE;
+
+    return orderList.slice(
+      startIndex,
+      endIndex,
+    );
+  }, [orderList, currentPage]);
+
+  /**
+ * ページを変更し、
+ * 購入履歴一覧の先頭へスクロールする。
+ */
+  const changePage = (
+    pageNumber: number,
+  ): void => {
+    setCurrentPage(pageNumber);
+
+    window.requestAnimationFrame(() => {
+      purchaseHistoryTopRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
+
   return (
     <div
+      ref={purchaseHistoryTopRef}
       className="
             mx-auto
+            
             max-w-5xl
             rounded-lg
-            border
             bg-white
             p-8
-            shadow-sm
         "
     >
       <h1
         className="
                 mb-6
                 text-center
+                border-b
                 text-2xl
                 font-bold
             "
@@ -106,7 +163,7 @@ export const PurchaseHistory = () => {
           </TableHeader>
 
           <TableBody>
-            {orderList.map((order) => (
+            {paginatedOrderList.map((order) => (
               <TableRow key={order.orderUuid}>
                 <TableCell>{order.orderUuid}</TableCell>
 
@@ -127,6 +184,7 @@ export const PurchaseHistory = () => {
                                                     bg-green-900
                                                     hover:bg-green-800
                                                 "
+                    disabled={isLoading}
                     onClick={() => {
                       router.push(`/purchase/history/${order.orderUuid}`);
                     }}
@@ -138,6 +196,84 @@ export const PurchaseHistory = () => {
             ))}
           </TableBody>
         </Table>
+      )}
+      {totalPages > 1 && (
+        <div
+          className="
+      mt-8
+      flex
+      flex-wrap
+      items-center
+      justify-center
+      gap-2
+    "
+        >
+          <Button
+            type="button"
+            variant="outline"
+            disabled={
+              isLoading ||
+              currentPage === 1
+            }
+            onClick={() => {
+              changePage(
+                Math.max(
+                  1,
+                  currentPage - 1,
+                ),
+              );
+            }}
+          >
+            前へ
+          </Button>
+
+          {Array.from(
+            {
+              length: totalPages,
+            },
+            (_, index) => index + 1,
+          ).map((pageNumber) => (
+            <Button
+              key={pageNumber}
+              type="button"
+              variant={
+                currentPage === pageNumber
+                  ? "default"
+                  : "outline"
+              }
+              className={
+                currentPage === pageNumber
+                  ? "bg-green-900 hover:bg-green-800"
+                  : ""
+              }
+              disabled={isLoading}
+              onClick={() => {
+                changePage(pageNumber);
+              }}
+            >
+              {pageNumber}
+            </Button>
+          ))}
+
+          <Button
+            type="button"
+            variant="outline"
+            disabled={
+              isLoading ||
+              currentPage === totalPages
+            }
+            onClick={() => {
+              changePage(
+                Math.min(
+                  totalPages,
+                  currentPage + 1,
+                ),
+              );
+            }}
+          >
+            次へ
+          </Button>
+        </div>
       )}
 
       <div

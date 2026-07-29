@@ -97,12 +97,11 @@ export const PurchaseHistoryDetail = () => {
     <div
       className="
             mx-auto
+            
             max-w-5xl
             rounded-lg
-            border
             bg-white
             p-8
-            shadow-sm
         "
     >
       <h1
@@ -110,6 +109,7 @@ export const PurchaseHistoryDetail = () => {
                 mb-6
                 text-center
                 text-2xl
+                border-b
                 font-bold
             "
       >

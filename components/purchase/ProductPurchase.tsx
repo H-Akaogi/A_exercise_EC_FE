@@ -131,11 +131,8 @@ export const ProductList = () => {
             mx-auto
             max-w-5xl
             rounded-lg
-            border
-            border-border
             bg-white
             p-8
-            shadow-sm
         "
     >
       <h2
