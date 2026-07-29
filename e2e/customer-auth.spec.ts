@@ -47,7 +47,7 @@ test.describe("UC002 顧客ログイン・UC008 顧客ログアウト", () => {
       },
     );
 
-    await page.route("**/proxy-api/login", async (route) => {
+    await page.route("**/ec-proxy-api/login", async (route) => {
       loginRequest = route.request().postDataJSON();
 
       await route.fulfill({
@@ -60,7 +60,7 @@ test.describe("UC002 顧客ログイン・UC008 顧客ログアウト", () => {
       });
     });
 
-    await page.route("**/proxy-api/logout", async (route) => {
+    await page.route("**/ec-proxy-api/logout", async (route) => {
       logoutAuthorization = route.request().headers().authorization;
 
       await route.fulfill({
@@ -72,7 +72,7 @@ test.describe("UC002 顧客ログイン・UC008 顧客ログアウト", () => {
       });
     });
 
-    await page.route("**/proxy-api/product/search", async (route) => {
+    await page.route("**/ec-proxy-api/product/search", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -156,7 +156,7 @@ test.describe("UC002 顧客ログイン・UC008 顧客ログアウト", () => {
       },
     );
 
-    await page.route("**/proxy-api/purchase/history", async (route) => {
+    await page.route("**/ec-proxy-api/purchase/history", async (route) => {
       await route.fulfill({
         status: 401,
         contentType: "application/json",
@@ -211,7 +211,7 @@ test.describe("UC002 顧客ログイン・UC008 顧客ログアウト", () => {
       },
     );
 
-    await page.route("**/proxy-api/payment-method/options", async (route) => {
+    await page.route("**/ec-proxy-api/payment-method/options", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -224,7 +224,7 @@ test.describe("UC002 顧客ログイン・UC008 顧客ログアウト", () => {
       });
     });
 
-    await page.route("**/proxy-api/purchase/complete", async (route) => {
+    await page.route("**/ec-proxy-api/purchase/complete", async (route) => {
       purchaseAuthorization = route.request().headers().authorization;
 
       await route.fulfill({
