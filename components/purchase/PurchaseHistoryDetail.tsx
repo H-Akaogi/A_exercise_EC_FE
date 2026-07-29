@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 
 import { useParams, useRouter } from "next/navigation";
 
@@ -92,6 +93,8 @@ export const PurchaseHistoryDetail = () => {
       </div>
     );
   }
+
+
 
   return (
     <div
@@ -196,6 +199,11 @@ export const PurchaseHistoryDetail = () => {
 
         <Button
           type="button"
+          className="
+    bg-green-900
+    hover:bg-green-800
+    text-white
+  "
           onClick={() => {
             router.push("/");
           }}
