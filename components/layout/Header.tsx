@@ -3,6 +3,7 @@
 import { ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useHydrated } from "@/components/hooks/useHydrated";
 
 import { useCustomerAuth } from "@/components/hooks/useCustomerAuth";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ export const Header = () => {
   const router = useRouter();
 
   const { totalQuantity } = useCart();
+  const isHydrated = useHydrated();
 
   const { isAuthenticated, username, logout } = useCustomerAuth();
 
@@ -192,7 +194,7 @@ export const Header = () => {
 
             <span>かご</span>
 
-            {totalQuantity > 0 && (
+            {isHydrated && totalQuantity > 0 && (
               <span
                 className="
                                 absolute

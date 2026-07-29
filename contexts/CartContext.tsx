@@ -200,21 +200,46 @@ export const CartProvider = ({ children }: CartProviderProps) => {
  */
   const updateCartProduct = useCallback(
     (product: ProductDetail): void => {
-      setCartItems((currentItems) =>
-        currentItems.map((item) =>
-          item.product.productUuid ===
-            product.productUuid
-            ? {
+      setCartItems((currentItems) => {
+        let hasChanged = false;
+
+        const updatedItems =
+          currentItems.map((item) => {
+            if (
+              item.product.productUuid !==
+              product.productUuid
+            ) {
+              return item;
+            }
+
+            const isSameProduct =
+              item.product.price === product.price
+              && item.product.stockQuantity
+              === product.stockQuantity
+              && item.product.productName
+              === product.productName
+              && item.product.productImage
+              === product.productImage;
+
+            if (isSameProduct) {
+              return item;
+            }
+
+            hasChanged = true;
+
+            return {
               ...item,
               product,
-            }
-            : item,
-        ),
-      );
+            };
+          });
+
+        return hasChanged
+          ? updatedItems
+          : currentItems;
+      });
     },
     [],
   );
-
   const value = useMemo<CartContextValue>(
     () => ({
       cartItems,
@@ -233,6 +258,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       addCart,
       removeCart,
       updateCartQuantity,
+      updateCartProduct,
       clearCart,
     ],
   );
