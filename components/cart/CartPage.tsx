@@ -43,7 +43,6 @@ export const CartPage = () => {
   const {
     paymentMethods,
     isLoading: isPaymentMethodLoading,
-    errorMessage: paymentMethodErrorMessage,
     findAll: findAllPaymentMethods,
   } = usePaymentMethod();
 

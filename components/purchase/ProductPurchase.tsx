@@ -73,9 +73,6 @@ export const ProductList = () => {
    * 現在のページに表示する商品
    */
   const paginatedProducts = useMemo(() => {
-    const sortedProducts = [...products].sort((left, right) =>
-      left.productUuid.localeCompare(right.productUuid),
-    );
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
     const endIndex = startIndex + ITEMS_PER_PAGE;

@@ -25,8 +25,6 @@ export const TopPage = () => {
 
   const { products, isLoading, errorMessage, findAll } = usePurchaseProduct();
 
-  const { totalQuantity } = useCart();
-
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
   /**
@@ -170,11 +168,10 @@ export const TopPage = () => {
                                         h-2.5
                                         w-2.5
                                         rounded-full
-                                        ${
-                                          index === currentImageIndex
-                                            ? "bg-green-700"
-                                            : "bg-white/80"
-                                        }
+                                        ${index === currentImageIndex
+                    ? "bg-green-700"
+                    : "bg-white/80"
+                  }
                                     `}
                 onClick={() => {
                   setCurrentImageIndex(index);
