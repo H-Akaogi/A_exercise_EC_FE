@@ -234,8 +234,8 @@ export const useCustomerAccount = () => {
                         message = "氏名を入力してください";
                     } else if (customer.name.length < 2 || customer.name.length > 20) {
                         message = "氏名は2〜20文字で入力してください";
-                    } else if (!kanaPattern.test(customer.kana)) {
-                        message = "氏名カナは全角カナで入力してください";
+                    } else if (!namePattern.test(customer.name)) {
+                        message = "氏名は全角・半角英数字で入力してください";
                     }
 
                     break;

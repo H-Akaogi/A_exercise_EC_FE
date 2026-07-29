@@ -38,7 +38,6 @@ export const CustomerAccountRegister = () => {
         updateField,
         validateField,
         submit,
-        reset,
     } = useCustomerAccount();
 
     /**

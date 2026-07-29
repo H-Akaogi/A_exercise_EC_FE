@@ -36,29 +36,35 @@ type CartProviderProps = {
 const STORAGE_KEY = "product-cart";
 
 export const CartProvider = ({ children }: CartProviderProps) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    /*
+     * Next.jsのサーバー側では、
+     * windowとlocalStorageが存在しない。
+     */
+    if (typeof window === "undefined") {
+      return [];
+    }
 
-  /*
-   * 画面更新後もかごを保持するため、
-   * localStorageから読み込む。
-   */
-  useEffect(() => {
-    const savedCart = window.localStorage.getItem(STORAGE_KEY);
+    const savedCart =
+      window.localStorage.getItem(STORAGE_KEY);
 
     if (!savedCart) {
-      return;
+      return [];
     }
 
     try {
-      const parsedCart = JSON.parse(savedCart) as CartItem[];
-
-      setCartItems(parsedCart);
+      return JSON.parse(savedCart) as CartItem[];
     } catch (error) {
-      console.error("かご情報の読み込みに失敗しました", error);
+      console.error(
+        "かご情報の読み込みに失敗しました",
+        error,
+      );
 
       window.localStorage.removeItem(STORAGE_KEY);
+
+      return [];
     }
-  }, []);
+  });
 
   /*
    * かごの変更をlocalStorageへ保存する。
@@ -99,10 +105,10 @@ export const CartProvider = ({ children }: CartProviderProps) => {
           return currentItems.map((item) =>
             item.product.productUuid === product.productUuid
               ? {
-                  ...item,
-                  product,
-                  quantity: newQuantity,
-                }
+                ...item,
+                product,
+                quantity: newQuantity,
+              }
               : item,
           );
         }
