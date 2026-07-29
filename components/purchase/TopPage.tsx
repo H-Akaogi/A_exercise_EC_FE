@@ -315,7 +315,7 @@ export const TopPage = () => {
                                             "
                                             onClick={() => {
                                                 router.push(
-                                                    `/products/${product.productUuid}`,
+                                                    `/products/detail/${product.productUuid}`,
                                                 );
                                             }}
                                         >

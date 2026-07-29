@@ -102,6 +102,16 @@ export const ProductList = () => {
     const paginatedProducts =
         useMemo(
             () => {
+                const sortedProducts =
+                    [...products].sort(
+                        (
+                            left,
+                            right,
+                        ) =>
+                            left.productUuid.localeCompare(
+                                right.productUuid,
+                            ),
+                    );
                 const startIndex =
                     (currentPage - 1)
                     * ITEMS_PER_PAGE;
