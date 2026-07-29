@@ -22,17 +22,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ja">
       <body className="flex min-h-screen flex-col">
-        <CartProvider>
-          <CustomerAuthProvider>
+        <CustomerAuthProvider>
+          <CartProvider>
             <Header />
 
             <main className="flex-1">
               {children}
             </main>
             <Footer />
-
-          </CustomerAuthProvider>
-        </CartProvider>
+          </CartProvider>
+        </CustomerAuthProvider>
       </body>
     </html>
   );
