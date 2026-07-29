@@ -1,5 +1,9 @@
 import { ProductList } from "@/components/purchase/ProductPurchase";
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "商品検索",
+};
 /**
  * 演習 6-3 Reactコンポーネントを実装してUIを確認する
  * 商品キーワード検索ページ

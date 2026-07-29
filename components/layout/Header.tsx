@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useCustomerAuth } from "@/components/hooks/useCustomerAuth";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { PencilLine } from "lucide-react";
 
 export const Header = () => {
   const router = useRouter();
@@ -73,21 +74,10 @@ export const Header = () => {
             router.push("/");
           }}
         >
-          <span
-            className="
-                        flex
-                        h-6
-                        w-6
-                        items-center
-                        justify-center
-                        rounded
-                        bg-green-700
-                        text-sm
-                        text-white
-                    "
-          >
-            ✓
-          </span>
+          <PencilLine
+            className="h-7 w-7"
+            aria-hidden="true"
+          />
 
           <span>フルネス文具</span>
         </button>
@@ -119,7 +109,7 @@ export const Header = () => {
               <button
                 type="button"
                 className="
-                                        text-gray-600
+                                        text-green-700
                                         hover:underline
                                     "
                 onClick={() => {
@@ -132,7 +122,7 @@ export const Header = () => {
               <button
                 type="button"
                 className="
-                                        text-gray-600
+                                        text-green-700
                                         hover:underline
                                         disabled:cursor-not-allowed
                                         disabled:opacity-60
@@ -154,7 +144,7 @@ export const Header = () => {
               <button
                 type="button"
                 className="
-                                        text-gray-600
+                                        text-green-700
                                         hover:underline
                                     "
                 onClick={() => {
@@ -167,7 +157,7 @@ export const Header = () => {
               <button
                 type="button"
                 className="
-                                        text-gray-600
+                                        text-green-700
                                         hover:underline
                                     "
                 onClick={() => {
