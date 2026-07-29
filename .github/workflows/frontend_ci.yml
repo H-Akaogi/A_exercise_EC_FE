@@ -132,14 +132,6 @@ jobs:
         env:
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
 
-      # E2Eで使用するChromiumと
-      # Linux側の依存パッケージをインストールする
-      - name: Playwrightのブラウザをインストール
-        run: |
-          npx playwright install \
-            --with-deps \
-            chromium
-
       # 公開済みの顧客バックエンドへ、
       # GitHub Actionsから接続できることを確認する
       #
