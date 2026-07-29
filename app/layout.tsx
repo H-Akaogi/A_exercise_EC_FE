@@ -4,6 +4,7 @@ import { CustomerAuthProvider } from "@/contexts/CustomerAuthContext";
 import { Header } from "@/components/layout/Header";
 import "./globals.css";
 import type { ReactNode } from "react";
+import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: {
@@ -26,6 +27,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <Header />
 
             <main>{children}</main>
+            <Footer />
+
           </CustomerAuthProvider>
         </CartProvider>
       </body>
