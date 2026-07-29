@@ -17,6 +17,8 @@ const nextConfig: NextConfig = {
   assetPrefix: "/ec-static",
 
   images: {
+    path: "/ec-static/_next/image",
+
     remotePatterns: [
       {
         protocol: "https",
