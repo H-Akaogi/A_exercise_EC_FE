@@ -16,6 +16,9 @@ export const ProductList = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
+  const [hideOutOfStock, setHideOutOfStock] =
+    useState<boolean>(false);
+
   const productListTopRef =
     useRef<HTMLDivElement | null>(null);
 
@@ -67,10 +70,28 @@ export const ProductList = () => {
 
   const displayErrorMessage = errorMessage || categoryErrorMessage;
 
+
+
   /**
-   * 総ページ数
-   */
-  const totalPages = Math.max(1, Math.ceil(products.length / ITEMS_PER_PAGE));
+ * 売り切れ商品の表示設定を反映した商品一覧
+ */
+  const filteredProducts = useMemo(() => {
+    if (!hideOutOfStock) {
+      return products;
+    }
+
+    return products.filter(
+      (product) =>
+        (product.productStock?.quantity ?? 0) > 0,
+    );
+  }, [products, hideOutOfStock]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      filteredProducts.length / ITEMS_PER_PAGE,
+    ),
+  );
 
   /**
    * 現在のページに表示する商品
@@ -80,8 +101,11 @@ export const ProductList = () => {
 
     const endIndex = startIndex + ITEMS_PER_PAGE;
 
-    return products.slice(startIndex, endIndex);
-  }, [products, currentPage]);
+    return filteredProducts.slice(
+      startIndex,
+      endIndex,
+    );
+  }, [filteredProducts, currentPage]);
 
   /**
  * ページを変更し、
@@ -194,6 +218,39 @@ export const ProductList = () => {
         >
           選択解除
         </Button>
+
+        {/* 売り切れ商品非表示 */}
+        <label
+          htmlFor="hideOutOfStock"
+          className="
+      ml-auto
+      flex
+      items-center
+      gap-2
+      whitespace-nowrap
+      text-sm
+      font-medium
+      text-gray-700
+    "
+        >
+          <input
+            id="hideOutOfStock"
+            type="checkbox"
+            checked={hideOutOfStock}
+            disabled={isPageLoading}
+            onChange={(event) => {
+              setHideOutOfStock(event.target.checked);
+              setCurrentPage(1);
+            }}
+            className="
+        h-4
+        w-4
+        accent-green-800
+      "
+          />
+
+          販売中の商品のみ表示する
+        </label>
       </div>
 
       {displayErrorMessage && (
