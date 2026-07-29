@@ -197,8 +197,109 @@ export const CartPage = () => {
     ]);
 
   useEffect(() => {
-    void refreshCartProducts();
-  }, [refreshCartProducts]);
+    let isCancelled = false;
+
+    const loadLatestCartProducts =
+      async (): Promise<void> => {
+        if (cartItems.length === 0) {
+          return;
+        }
+
+        try {
+          /*
+           * 更新前のカート情報を保持する。
+           */
+          const currentCartItems = [...cartItems];
+
+          const latestProducts =
+            await Promise.all(
+              currentCartItems.map((item) =>
+                purchaseService.findById(
+                  item.product.productUuid,
+                ),
+              ),
+            );
+
+          /*
+           * コンポーネント破棄後は状態を更新しない。
+           */
+          if (isCancelled) {
+            return;
+          }
+
+          const errors: CartItemError[] = [];
+
+          latestProducts.forEach(
+            (product, index) => {
+              const cartItem =
+                currentCartItems[index];
+
+              if (product === null) {
+                errors.push({
+                  productUuid:
+                    cartItem.product.productUuid,
+                  message:
+                    "商品情報を取得できませんでした",
+                });
+
+                return;
+              }
+
+              updateCartProduct(product);
+
+              if (product.stockQuantity <= 0) {
+                errors.push({
+                  productUuid:
+                    product.productUuid,
+                  message:
+                    "現在、在庫切れです",
+                });
+
+                return;
+              }
+
+              if (
+                cartItem.quantity >
+                product.stockQuantity
+              ) {
+                errors.push({
+                  productUuid:
+                    product.productUuid,
+                  message:
+                    `現在購入できるのは`
+                    + `${product.stockQuantity}個までです`,
+                });
+              }
+            },
+          );
+
+          setCartItemErrors(errors);
+        } catch (error) {
+          if (isCancelled) {
+            return;
+          }
+
+          console.error(
+            "かご内の商品情報の取得に失敗しました",
+            error,
+          );
+
+          setErrorMessage(
+            "最新の商品情報を取得できませんでした",
+          );
+        }
+      };
+
+    void loadLatestCartProducts();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [
+    cartItems,
+    purchaseService,
+    updateCartProduct,
+  ]);
 
   const hasOutOfStockItem = cartItemErrors.some(
     (error) => error.message === "現在、在庫切れです",
