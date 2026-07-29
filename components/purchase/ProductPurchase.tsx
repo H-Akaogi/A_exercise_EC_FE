@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import Image from "next/image";
@@ -15,6 +15,9 @@ export const ProductList = () => {
   const ITEMS_PER_PAGE = 12;
 
   const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const productListTopRef =
+    useRef<HTMLDivElement | null>(null);
 
   /**
    * 商品一覧と商品検索
@@ -80,8 +83,26 @@ export const ProductList = () => {
     return products.slice(startIndex, endIndex);
   }, [products, currentPage]);
 
+  /**
+ * ページを変更し、
+ * 商品一覧の先頭までスクロールする。
+ */
+  const changePage = (
+    pageNumber: number,
+  ): void => {
+    setCurrentPage(pageNumber);
+
+    window.requestAnimationFrame(() => {
+      productListTopRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
+
   return (
     <div
+      ref={productListTopRef}
       className="
             mx-auto
             max-w-5xl
@@ -359,9 +380,17 @@ export const ProductList = () => {
           <Button
             type="button"
             variant="outline"
-            disabled={isPageLoading || currentPage === 1}
+            disabled={
+              isPageLoading
+              || currentPage === 1
+            }
             onClick={() => {
-              setCurrentPage((page) => Math.max(1, page - 1));
+              changePage(
+                Math.max(
+                  1,
+                  currentPage - 1,
+                ),
+              );
             }}
           >
             前へ
@@ -376,7 +405,11 @@ export const ProductList = () => {
             <Button
               key={pageNumber}
               type="button"
-              variant={currentPage === pageNumber ? "default" : "outline"}
+              variant={
+                currentPage === pageNumber
+                  ? "default"
+                  : "outline"
+              }
               className={
                 currentPage === pageNumber
                   ? "bg-green-900 hover:bg-green-800"
@@ -384,7 +417,7 @@ export const ProductList = () => {
               }
               disabled={isPageLoading}
               onClick={() => {
-                setCurrentPage(pageNumber);
+                changePage(pageNumber);
               }}
             >
               {pageNumber}
@@ -394,9 +427,17 @@ export const ProductList = () => {
           <Button
             type="button"
             variant="outline"
-            disabled={isPageLoading || currentPage === totalPages}
+            disabled={
+              isPageLoading
+              || currentPage === totalPages
+            }
             onClick={() => {
-              setCurrentPage((page) => Math.min(totalPages, page + 1));
+              changePage(
+                Math.min(
+                  totalPages,
+                  currentPage + 1,
+                ),
+              );
             }}
           >
             次へ

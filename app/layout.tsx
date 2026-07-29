@@ -21,16 +21,17 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ja">
-      <body>
-        <CartProvider>
-          <CustomerAuthProvider>
+      <body className="flex min-h-screen flex-col">
+        <CustomerAuthProvider>
+          <CartProvider>
             <Header />
 
-            <main>{children}</main>
+            <main className="flex-1">
+              {children}
+            </main>
             <Footer />
-
-          </CustomerAuthProvider>
-        </CartProvider>
+          </CartProvider>
+        </CustomerAuthProvider>
       </body>
     </html>
   );
