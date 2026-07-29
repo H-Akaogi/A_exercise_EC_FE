@@ -73,7 +73,7 @@ describe("OrderRepository", () => {
 
       expect(customerAuthServiceMock.getAccessToken).toHaveBeenCalledTimes(1);
 
-      expect(fetchMock).toHaveBeenCalledWith("/proxy-api/purchase/history", {
+      expect(fetchMock).toHaveBeenCalledWith("/ec-proxy-api/purchase/history", {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -119,7 +119,7 @@ describe("OrderRepository", () => {
 
       const result = await repository.findPurchaseHistory();
 
-      expect(fetchMock).toHaveBeenCalledWith("/proxy-api/purchase/history", {
+      expect(fetchMock).toHaveBeenCalledWith("/ec-proxy-api/purchase/history", {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -285,7 +285,7 @@ describe("OrderRepository", () => {
       const result = await repository.findById("order uuid/001");
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/purchase/history/order%20uuid%2F001",
+        "/ec-proxy-api/purchase/history/order%20uuid%2F001",
         {
           method: "GET",
           headers: {
@@ -359,7 +359,7 @@ describe("OrderRepository", () => {
       await repository.findById("order-uuid-001");
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/purchase/history/order-uuid-001",
+        "/ec-proxy-api/purchase/history/order-uuid-001",
         {
           method: "GET",
           headers: {

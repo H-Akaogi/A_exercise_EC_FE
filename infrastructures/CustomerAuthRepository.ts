@@ -29,7 +29,7 @@ export class CustomerAuthRepository implements ICustomerAuthRepository {
     let response: Response;
 
     try {
-      response = await fetch("/proxy-api/login", {
+      response = await fetch("/ec-proxy-api/login", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -76,8 +76,8 @@ export class CustomerAuthRepository implements ICustomerAuthRepository {
       expiresAt: responseData.expiresAt,
       ...(username
         ? {
-            username,
-          }
+          username,
+        }
         : {}),
     };
   }
@@ -86,7 +86,7 @@ export class CustomerAuthRepository implements ICustomerAuthRepository {
     let response: Response;
 
     try {
-      response = await fetch("/proxy-api/logout", {
+      response = await fetch("/ec-proxy-api/logout", {
         method: "POST",
         headers: {
           Accept: "application/json",

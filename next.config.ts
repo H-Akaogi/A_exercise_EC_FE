@@ -8,6 +8,14 @@ const apiBaseUrl = (
 const nextConfig: NextConfig = {
   output: "standalone",
 
+  /**
+ * 管理フロントの /_next と競合しないようにする。
+ *
+ * 顧客フロントのJavaScript・CSSは
+ * /ec-static/_next/static/... から配信される。
+ */
+  assetPrefix: "/ec-static",
+
   images: {
     remotePatterns: [
       {
@@ -22,39 +30,39 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/proxy-api/login",
+        source: "/ec-proxy-api/login",
         destination: `${apiBaseUrl}/login`,
       },
       {
-        source: "/proxy-api/logout",
+        source: "/ec-proxy-api/logout",
         destination: `${apiBaseUrl}/logout`,
       },
       {
-        source: "/proxy-api/account/:path*",
+        source: "/ec-proxy-api/account/:path*",
         destination: `${apiBaseUrl}/account/:path*`,
       },
       {
-        source: "/proxy-api/product/:path*",
+        source: "/ec-proxy-api/product/:path*",
         destination: `${apiBaseUrl}/product/:path*`,
       },
       {
-        source: "/proxy-api/products/:path*",
+        source: "/ec-proxy-api/products/:path*",
         destination: `${apiBaseUrl}/products/:path*`,
       },
       {
-        source: "/proxy-api/purchase/complete/:path*",
+        source: "/ec-proxy-api/purchase/complete/:path*",
         destination: `${apiBaseUrl}/purchase/complete/:path*`,
       },
       {
-        source: "/proxy-api/purchase/history/:path*",
+        source: "/ec-proxy-api/purchase/history/:path*",
         destination: `${apiBaseUrl}/purchase/history/:path*`,
       },
       {
-        source: "/proxy-api/product-category/options",
+        source: "/ec-proxy-api/product-category/options",
         destination: `${apiBaseUrl}/product-category/options`,
       },
       {
-        source: "/proxy-api/payment-method/options",
+        source: "/ec-proxy-api/payment-method/options",
         destination: `${apiBaseUrl}/payment-method/options`,
       },
     ];

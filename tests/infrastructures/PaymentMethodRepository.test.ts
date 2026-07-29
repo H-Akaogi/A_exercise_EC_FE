@@ -45,7 +45,7 @@ describe("PaymentMethodRepository", () => {
       expect(fetchMock).toHaveBeenCalledTimes(1);
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/payment-method/options",
+        "/ec-proxy-api/payment-method/options",
         {
           method: "GET",
           headers: {

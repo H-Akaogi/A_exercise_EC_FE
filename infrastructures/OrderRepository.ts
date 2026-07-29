@@ -18,7 +18,7 @@ export class OrderRepository implements IOrderRepository {
   constructor(
     @inject(TYPES.ICustomerAuthService)
     private readonly customerAuthService: ICustomerAuthService,
-  ) {}
+  ) { }
 
   /**
    * ログイン中の顧客の購入履歴を取得する
@@ -26,7 +26,7 @@ export class OrderRepository implements IOrderRepository {
    * @returns 購入履歴一覧
    */
   public async findPurchaseHistory(): Promise<SearchOrdersResponse> {
-    const url = "/proxy-api/purchase/history";
+    const url = "/ec-proxy-api/purchase/history";
 
     const response = await fetch(url, {
       method: "GET",
@@ -66,9 +66,9 @@ export class OrderRepository implements IOrderRepository {
 
       throw new Error(
         errorData.message ??
-          errorData.detail ??
-          errorData.title ??
-          `購入履歴の取得に失敗しました (Status: ${response.status})`,
+        errorData.detail ??
+        errorData.title ??
+        `購入履歴の取得に失敗しました (Status: ${response.status})`,
       );
     }
 
@@ -103,7 +103,7 @@ export class OrderRepository implements IOrderRepository {
    * @returns 注文詳細
    */
   public async findById(orderUuid: string): Promise<Orders> {
-    const url = `/proxy-api/purchase/history/${encodeURIComponent(orderUuid)}`;
+    const url = `/ec-proxy-api/purchase/history/${encodeURIComponent(orderUuid)}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -150,9 +150,9 @@ export class OrderRepository implements IOrderRepository {
 
       throw new Error(
         errorData.message ??
-          errorData.detail ??
-          errorData.title ??
-          `購入履歴詳細の取得に失敗しました (Status: ${response.status})`,
+        errorData.detail ??
+        errorData.title ??
+        `購入履歴詳細の取得に失敗しました (Status: ${response.status})`,
       );
     }
 

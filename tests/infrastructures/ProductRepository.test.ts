@@ -58,7 +58,7 @@ describe("ProductRepository", () => {
       const result = await repository.findByCategory("category uuid/001");
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/product/search?productCategoryUuid=category+uuid%2F001",
+        "/ec-proxy-api/product/search?productCategoryUuid=category+uuid%2F001",
         {
           method: "GET",
           headers: {
@@ -81,7 +81,7 @@ describe("ProductRepository", () => {
 
       const result = await repository.findByCategory();
 
-      expect(fetchMock).toHaveBeenCalledWith("/proxy-api/product/search", {
+      expect(fetchMock).toHaveBeenCalledWith("/ec-proxy-api/product/search", {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -103,7 +103,7 @@ describe("ProductRepository", () => {
       await repository.findByCategory("");
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/product/search",
+        "/ec-proxy-api/product/search",
         expect.any(Object),
       );
     });
@@ -118,7 +118,7 @@ describe("ProductRepository", () => {
       await repository.findByCategory("   ");
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/product/search",
+        "/ec-proxy-api/product/search",
         expect.any(Object),
       );
     });
@@ -216,7 +216,7 @@ describe("ProductRepository", () => {
       const result = await repository.findById("product uuid/001");
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/products/detail/product%20uuid%2F001",
+        "/ec-proxy-api/products/detail/product%20uuid%2F001",
         {
           method: "GET",
           headers: {
@@ -284,7 +284,7 @@ describe("ProductRepository", () => {
 
       expect(customerAuthServiceMock.getAccessToken).toHaveBeenCalledTimes(1);
 
-      expect(fetchMock).toHaveBeenCalledWith("/proxy-api/purchase/complete", {
+      expect(fetchMock).toHaveBeenCalledWith("/ec-proxy-api/purchase/complete", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -15,7 +15,7 @@ export class ProductRepository implements IProductRepository {
   constructor(
     @inject(TYPES.ICustomerAuthService)
     private readonly customerAuthService: ICustomerAuthService,
-  ) {}
+  ) { }
 
   /**
    * 商品を検索する
@@ -41,8 +41,8 @@ export class ProductRepository implements IProductRepository {
     const query = params.toString();
 
     const url = query
-      ? `/proxy-api/product/search?${query}`
-      : "/proxy-api/product/search";
+      ? `/ec-proxy-api/product/search?${query}`
+      : "/ec-proxy-api/product/search";
 
     const response = await fetch(url, {
       method: "GET",
@@ -68,9 +68,9 @@ export class ProductRepository implements IProductRepository {
 
       throw new Error(
         errorData.message ??
-          errorData.detail ??
-          errorData.title ??
-          `商品一覧の取得に失敗しました (Status: ${response.status})`,
+        errorData.detail ??
+        errorData.title ??
+        `商品一覧の取得に失敗しました (Status: ${response.status})`,
       );
     }
 
@@ -81,7 +81,7 @@ export class ProductRepository implements IProductRepository {
    * 商品UUIDを指定して商品を取得する
    */
   public async findById(productUuid: string): Promise<ProductDetail | null> {
-    const url = `/proxy-api/products/detail/${encodeURIComponent(productUuid)}`;
+    const url = `/ec-proxy-api/products/detail/${encodeURIComponent(productUuid)}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -114,7 +114,7 @@ export class ProductRepository implements IProductRepository {
       quantity: number;
     }[],
   ): Promise<void> {
-    const url = "/proxy-api/purchase/complete";
+    const url = "/ec-proxy-api/purchase/complete";
 
     /*
      * フロント側でも最低限の入力確認を行う。
@@ -180,9 +180,9 @@ export class ProductRepository implements IProductRepository {
 
       throw new Error(
         errorData.message ??
-          errorData.detail ??
-          errorData.title ??
-          "商品または支払い方法が見つかりませんでした。",
+        errorData.detail ??
+        errorData.title ??
+        "商品または支払い方法が見つかりませんでした。",
       );
     }
 

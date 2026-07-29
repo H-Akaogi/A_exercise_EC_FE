@@ -49,13 +49,13 @@ const installCustomerApiMocks = async (
   let createRequestCount = 0;
   let createRequestBody: CustomerRequestBody | null = null;
 
-  await page.route("**/proxy-api/account/**", async (route) => {
+  await page.route("**/ec-proxy-api/account/**", async (route) => {
     const request = route.request();
     const url = new URL(request.url());
 
     if (
       request.method() === "GET" &&
-      url.pathname === "/proxy-api/account/form"
+      url.pathname === "/ec-proxy-api/account/form"
     ) {
       const status = options.formStatus ?? 200;
 
@@ -65,21 +65,21 @@ const installCustomerApiMocks = async (
         body: JSON.stringify(
           status === 200
             ? {
-                title: FORM_TITLE,
-                model: {
-                  name: "",
-                  kana: "",
-                  address1: "",
-                  address2: null,
-                  phoneNumber: "",
-                  mailAddress: "",
-                  username: "",
-                  password: "",
-                },
-              }
-            : {
-                message: "顧客登録画面の初期情報を取得できませんでした。",
+              title: FORM_TITLE,
+              model: {
+                name: "",
+                kana: "",
+                address1: "",
+                address2: null,
+                phoneNumber: "",
+                mailAddress: "",
+                username: "",
+                password: "",
               },
+            }
+            : {
+              message: "顧客登録画面の初期情報を取得できませんでした。",
+            },
         ),
       });
       return;
@@ -87,7 +87,7 @@ const installCustomerApiMocks = async (
 
     if (
       request.method() === "GET" &&
-      url.pathname === "/proxy-api/account/validate/username"
+      url.pathname === "/ec-proxy-api/account/validate/username"
     ) {
       const username = url.searchParams.get("username");
       const isDuplicate =
@@ -100,13 +100,13 @@ const installCustomerApiMocks = async (
         body: JSON.stringify(
           isDuplicate
             ? {
-                exists: true,
-                message: "このアカウント名は既に使用されています",
-              }
+              exists: true,
+              message: "このアカウント名は既に使用されています",
+            }
             : {
-                exists: false,
-                message: "使用できるアカウント名です",
-              },
+              exists: false,
+              message: "使用できるアカウント名です",
+            },
         ),
       });
       return;
@@ -114,7 +114,7 @@ const installCustomerApiMocks = async (
 
     if (
       request.method() === "GET" &&
-      url.pathname === "/proxy-api/account/validate/mail-address"
+      url.pathname === "/ec-proxy-api/account/validate/mail-address"
     ) {
       const mailAddress = url.searchParams.get("mailAddress");
       const isDuplicate =
@@ -127,13 +127,13 @@ const installCustomerApiMocks = async (
         body: JSON.stringify(
           isDuplicate
             ? {
-                exists: true,
-                message: "このメールアドレスは既に登録されています",
-              }
+              exists: true,
+              message: "このメールアドレスは既に登録されています",
+            }
             : {
-                exists: false,
-                message: "使用できるメールアドレスです",
-              },
+              exists: false,
+              message: "使用できるメールアドレスです",
+            },
         ),
       });
       return;
@@ -141,7 +141,7 @@ const installCustomerApiMocks = async (
 
     if (
       request.method() === "POST" &&
-      url.pathname === "/proxy-api/account/complete"
+      url.pathname === "/ec-proxy-api/account/complete"
     ) {
       createRequestCount++;
       createRequestBody = request.postDataJSON() as CustomerRequestBody;
@@ -166,16 +166,16 @@ const installCustomerApiMocks = async (
         body: JSON.stringify(
           status === 201
             ? {
-                title: "顧客アカウント登録完了",
-                message: "顧客アカウントを登録しました。",
-                customerUuid: CUSTOMER_UUID,
-                name: createRequestBody.name,
-                username: createRequestBody.username,
-                createdAt: "2026-07-28T14:00:00+09:00",
-              }
+              title: "顧客アカウント登録完了",
+              message: "顧客アカウントを登録しました。",
+              customerUuid: CUSTOMER_UUID,
+              name: createRequestBody.name,
+              username: createRequestBody.username,
+              createdAt: "2026-07-28T14:00:00+09:00",
+            }
             : {
-                message: "顧客アカウントの登録に失敗しました。",
-              },
+              message: "顧客アカウントの登録に失敗しました。",
+            },
         ),
       });
       return;
@@ -455,7 +455,7 @@ test.describe("UC001 顧客アカウント登録", () => {
   test("メールアドレスとアカウント名の重複をフォーカス離脱時に表示する", async ({
     page,
   }) => {
-    await page.unroute("**/proxy-api/account/**");
+    await page.unroute("**/ec-proxy-api/account/**");
     await installCustomerApiMocks(page, {
       duplicateUsername: validCustomer.username,
       duplicateMailAddress: validCustomer.mailAddress,
@@ -580,7 +580,7 @@ test.describe("UC001 顧客アカウント登録", () => {
   });
 
   test("登録APIの入力エラーを該当項目に表示する", async ({ page }) => {
-    await page.unroute("**/proxy-api/account/**");
+    await page.unroute("**/ec-proxy-api/account/**");
     await installCustomerApiMocks(page, {
       createValidationErrors: {
         MailAddress: ["このメールアドレスは登録できません。"],
@@ -603,7 +603,7 @@ test.describe("UC001 顧客アカウント登録", () => {
   test("登録API失敗時は入力画面にエラーメッセージを表示する", async ({
     page,
   }) => {
-    await page.unroute("**/proxy-api/account/**");
+    await page.unroute("**/ec-proxy-api/account/**");
     await installCustomerApiMocks(page, {
       createStatus: 500,
     });
@@ -630,7 +630,7 @@ test.describe("UC001 顧客アカウント登録", () => {
   test("初期情報取得API失敗時はエラーメッセージを表示する", async ({
     page,
   }) => {
-    await page.unroute("**/proxy-api/account/**");
+    await page.unroute("**/ec-proxy-api/account/**");
     await installCustomerApiMocks(page, {
       formStatus: 500,
     });
