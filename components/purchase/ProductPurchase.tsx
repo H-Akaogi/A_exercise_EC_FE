@@ -314,6 +314,19 @@ export const ProductList = () => {
                 {product.price.toLocaleString()}円
               </p>
 
+              {product.productStock!.quantity === 0 && (
+                <p
+                  className="
+      mt-2
+      text-sm
+      font-bold
+      text-red-700
+    "
+                >
+                  売り切れ中です
+                </p>
+              )}
+
               <Button
                 type="button"
                 className="
@@ -321,7 +334,7 @@ export const ProductList = () => {
                                         bg-green-900
                                         hover:bg-green-800
                                     "
-                disabled={isLoading}
+                disabled={isLoading || product.productStock!.quantity === 0}
                 onClick={() => {
                   router.push(`/products/detail/${product.productUuid}`);
                 }}
