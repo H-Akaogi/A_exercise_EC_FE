@@ -46,7 +46,7 @@ describe("ProductRepository 購入確定の顧客JWT認証", () => {
 
     expect(getAccessToken).toHaveBeenCalledOnce();
     expect(fetchMock).toHaveBeenCalledWith(
-      "/proxy-api/purchase/complete",
+      "/ec-proxy-api/purchase/complete",
       expect.objectContaining({
         method: "POST",
         headers: {

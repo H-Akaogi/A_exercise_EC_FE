@@ -52,7 +52,7 @@ describe("CustomerRepository", () => {
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
 
-      expect(fetchMock).toHaveBeenCalledWith("/proxy-api/account/form", {
+      expect(fetchMock).toHaveBeenCalledWith("/ec-proxy-api/account/form", {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -189,7 +189,7 @@ describe("CustomerRepository", () => {
       const result = await repository.existsByAccountName("test user");
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/account/validate/username?username=test+user",
+        "/ec-proxy-api/account/validate/username?username=test+user",
         {
           method: "GET",
           headers: {
@@ -313,7 +313,7 @@ describe("CustomerRepository", () => {
       const result = await repository.existsByMail("test+sample@example.com");
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/account/validate/mail-address?mailAddress=test%2Bsample%40example.com",
+        "/ec-proxy-api/account/validate/mail-address?mailAddress=test%2Bsample%40example.com",
         {
           method: "GET",
           headers: {
@@ -456,7 +456,7 @@ describe("CustomerRepository", () => {
 
       const result = await repository.create(customer);
 
-      expect(fetchMock).toHaveBeenCalledWith("/proxy-api/account/complete", {
+      expect(fetchMock).toHaveBeenCalledWith("/ec-proxy-api/account/complete", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

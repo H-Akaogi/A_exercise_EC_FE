@@ -13,7 +13,7 @@ export class CustomerRepository implements ICustomerRepository {
    * 顧客登録フォームの初期情報を取得する
    */
   public async getForm(): Promise<CustomerFormResponse> {
-    const url = "/proxy-api/account/form";
+    const url = "/ec-proxy-api/account/form";
 
     const response = await fetch(url, {
       method: "GET",
@@ -46,9 +46,9 @@ export class CustomerRepository implements ICustomerRepository {
 
       throw new Error(
         errorData.message ??
-          errorData.detail ??
-          errorData.title ??
-          `顧客登録画面の初期情報取得に失敗しました (Status: ${response.status})`,
+        errorData.detail ??
+        errorData.title ??
+        `顧客登録画面の初期情報取得に失敗しました (Status: ${response.status})`,
       );
     }
 
@@ -91,7 +91,7 @@ export class CustomerRepository implements ICustomerRepository {
       username: accountName,
     });
 
-    const url = `/proxy-api/account/validate/username?${params.toString()}`;
+    const url = `/ec-proxy-api/account/validate/username?${params.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -157,7 +157,7 @@ export class CustomerRepository implements ICustomerRepository {
       mailAddress: mail,
     });
 
-    const url = `/proxy-api/account/validate/mail-address?${params.toString()}`;
+    const url = `/ec-proxy-api/account/validate/mail-address?${params.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -219,7 +219,7 @@ export class CustomerRepository implements ICustomerRepository {
    * 担当者アカウントを登録する
    */
   public async create(Customer: Customer): Promise<CustomerCompleteResponse> {
-    const url = "/proxy-api/account/complete";
+    const url = "/ec-proxy-api/account/complete";
 
     const requestBody = {
       name: Customer.name,

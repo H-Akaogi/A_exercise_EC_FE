@@ -6,7 +6,7 @@ import type { ProductCategory } from "@/models/ProductCategory";
 @injectable()
 export class ProductCategoryRepository implements IProductCategoryRepository {
   public async findAll(): Promise<ProductCategory[]> {
-    const url = "/proxy-api/product-category/options";
+    const url = "/ec-proxy-api/product-category/options";
 
     const response = await fetch(url, {
       method: "GET",
@@ -26,9 +26,9 @@ export class ProductCategoryRepository implements IProductCategoryRepository {
 
       throw new Error(
         errorData.message ??
-          errorData.detail ??
-          errorData.title ??
-          `カテゴリ一覧の取得に失敗しました (Status: ${response.status})`,
+        errorData.detail ??
+        errorData.title ??
+        `カテゴリ一覧の取得に失敗しました (Status: ${response.status})`,
       );
     }
 

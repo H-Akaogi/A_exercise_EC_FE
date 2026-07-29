@@ -19,7 +19,7 @@ CustomerRepository
 
 | 項目           | 内容                          |
 | -------------- | ----------------------------- |
-| エンドポイント | `GET /proxy-api/account/form` |
+| エンドポイント | `GET /ec-proxy-api/account/form` |
 | HTTPメソッド   | GET                           |
 | Repository     | CustomerRepository            |
 | メソッド       | `getForm()`                   |
@@ -36,7 +36,7 @@ CustomerRepository
 
 | 項目           | 内容                                                           |
 | -------------- | -------------------------------------------------------------- |
-| エンドポイント | `GET /proxy-api/account/validate/username?username={username}` |
+| エンドポイント | `GET /ec-proxy-api/account/validate/username?username={username}` |
 | HTTPメソッド   | GET                                                            |
 | Repository     | CustomerRepository                                             |
 | メソッド       | `existsByAccountName(accountName)`                             |
@@ -61,7 +61,7 @@ CustomerRepository
 
 | 項目           | 内容                                                                     |
 | -------------- | ------------------------------------------------------------------------ |
-| エンドポイント | `GET /proxy-api/account/validate/mail-address?mailAddress={mailAddress}` |
+| エンドポイント | `GET /ec-proxy-api/account/validate/mail-address?mailAddress={mailAddress}` |
 | HTTPメソッド   | GET                                                                      |
 | Repository     | CustomerRepository                                                       |
 | メソッド       | `existsByMail(mailAddress)`                                              |
@@ -86,7 +86,7 @@ CustomerRepository
 
 | 項目           | 内容                               |
 | -------------- | ---------------------------------- |
-| エンドポイント | `POST /proxy-api/account/complete` |
+| エンドポイント | `POST /ec-proxy-api/account/complete` |
 | HTTPメソッド   | POST                               |
 | Repository     | CustomerRepository                 |
 | メソッド       | `create(customer)`                 |
@@ -157,7 +157,7 @@ ProductCategoryRepository
 
 | 項目           | 内容                                      |
 | -------------- | ----------------------------------------- |
-| エンドポイント | `GET /proxy-api/product-category/options` |
+| エンドポイント | `GET /ec-proxy-api/product-category/options` |
 | HTTPメソッド   | GET                                       |
 | Repository     | ProductCategoryRepository                 |
 | メソッド       | `findAll()`                               |
@@ -179,7 +179,7 @@ label → name
 
 | 項目           | 内容                            |
 | -------------- | ------------------------------- |
-| エンドポイント | `GET /proxy-api/product/search` |
+| エンドポイント | `GET /ec-proxy-api/product/search` |
 | HTTPメソッド   | GET                             |
 | Repository     | ProductRepository               |
 | メソッド       | `findByCategory()`              |
@@ -196,7 +196,7 @@ label → name
 
 | 項目           | 内容                                                                      |
 | -------------- | ------------------------------------------------------------------------- |
-| エンドポイント | `GET /proxy-api/product/search?productCategoryUuid={productCategoryUuid}` |
+| エンドポイント | `GET /ec-proxy-api/product/search?productCategoryUuid={productCategoryUuid}` |
 | HTTPメソッド   | GET                                                                       |
 | Repository     | ProductRepository                                                         |
 | メソッド       | `findByCategory(productCategoryUuid)`                                     |
@@ -223,7 +223,7 @@ ProductRepository
 
 | 項目           | 内容                                           |
 | -------------- | ---------------------------------------------- |
-| エンドポイント | `GET /proxy-api/products/detail/{productUuid}` |
+| エンドポイント | `GET /ec-proxy-api/products/detail/{productUuid}` |
 | HTTPメソッド   | GET                                            |
 | Repository     | ProductRepository                              |
 | メソッド       | `findById(productUuid)`                        |
@@ -289,7 +289,7 @@ PaymentMethodRepository
 
 | 項目           | 内容                                    |
 | -------------- | --------------------------------------- |
-| エンドポイント | `GET /proxy-api/payment-method/options` |
+| エンドポイント | `GET /ec-proxy-api/payment-method/options` |
 | HTTPメソッド   | GET                                     |
 | Repository     | PaymentMethodRepository                 |
 | メソッド       | `findAll()`                             |
@@ -311,7 +311,7 @@ label → name
 
 | 項目           | 内容                                |
 | -------------- | ----------------------------------- |
-| エンドポイント | `POST /proxy-api/purchase/complete` |
+| エンドポイント | `POST /ec-proxy-api/purchase/complete` |
 | HTTPメソッド   | POST                                |
 | Repository     | ProductRepository                   |
 | メソッド       | `purchase(paymentMethodId, items)`  |
@@ -427,7 +427,7 @@ OrderRepository
 
 | 項目           | 内容                              |
 | -------------- | --------------------------------- |
-| エンドポイント | `GET /proxy-api/purchase/history` |
+| エンドポイント | `GET /ec-proxy-api/purchase/history` |
 | HTTPメソッド   | GET                               |
 | Repository     | OrderRepository                   |
 | メソッド       | `findPurchaseHistory()`           |
@@ -468,7 +468,7 @@ detailUrl
 
 | 項目           | 内容                                          |
 | -------------- | --------------------------------------------- |
-| エンドポイント | `GET /proxy-api/purchase/history/{orderUuid}` |
+| エンドポイント | `GET /ec-proxy-api/purchase/history/{orderUuid}` |
 | HTTPメソッド   | GET                                           |
 | Repository     | OrderRepository                               |
 | メソッド       | `findById(orderUuid)`                         |

@@ -6,7 +6,7 @@ import type { PaymentMethod } from "@/models/PaymentMethod";
 @injectable()
 export class PaymentMethodRepository implements IPaymentMethodRepository {
   public async findAll(): Promise<PaymentMethod[]> {
-    const url = "/proxy-api/payment-method/options";
+    const url = "/ec-proxy-api/payment-method/options";
 
     const response = await fetch(url, {
       method: "GET",
@@ -26,9 +26,9 @@ export class PaymentMethodRepository implements IPaymentMethodRepository {
 
       throw new Error(
         errorData.message ??
-          errorData.detail ??
-          errorData.title ??
-          `カテゴリ一覧の取得に失敗しました (Status: ${response.status})`,
+        errorData.detail ??
+        errorData.title ??
+        `カテゴリ一覧の取得に失敗しました (Status: ${response.status})`,
       );
     }
 

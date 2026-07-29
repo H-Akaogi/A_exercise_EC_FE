@@ -23,7 +23,7 @@ describe("CustomerAuthRepository", () => {
   });
 
   describe("login", () => {
-    it("POST /proxy-api/loginへ認証情報を送信してJWTと有効期限を返す", async () => {
+    it("POST /ec-proxy-api/loginへ認証情報を送信してJWTと有効期限を返す", async () => {
       const fetchMock = vi.fn().mockResolvedValue(
         createResponse(200, {
           accessToken: "customer-jwt",
@@ -47,7 +47,7 @@ describe("CustomerAuthRepository", () => {
 
       const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
 
-      expect(url).toBe("/proxy-api/login");
+      expect(url).toBe("/ec-proxy-api/login");
       expect(options.method).toBe("POST");
       expect(JSON.parse(options.body as string)).toEqual({
         mailAddress: "ando.taro@example.com",
@@ -192,7 +192,7 @@ describe("CustomerAuthRepository", () => {
   });
 
   describe("logout", () => {
-    it("Bearer JWT付きでPOST /proxy-api/logoutを呼ぶ", async () => {
+    it("Bearer JWT付きでPOST /ec-proxy-api/logoutを呼ぶ", async () => {
       const fetchMock = vi.fn().mockResolvedValue(
         createResponse(200, {
           loggedOut: true,
@@ -207,7 +207,7 @@ describe("CustomerAuthRepository", () => {
 
       const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
 
-      expect(url).toBe("/proxy-api/logout");
+      expect(url).toBe("/ec-proxy-api/logout");
       expect(options.method).toBe("POST");
       expect((options.headers as Record<string, string>).Authorization).toBe(
         "Bearer customer-jwt",

@@ -45,7 +45,7 @@ describe("ProductCategoryRepository", () => {
       expect(fetchMock).toHaveBeenCalledTimes(1);
 
       expect(fetchMock).toHaveBeenCalledWith(
-        "/proxy-api/product-category/options",
+        "/ec-proxy-api/product-category/options",
         {
           method: "GET",
           headers: {

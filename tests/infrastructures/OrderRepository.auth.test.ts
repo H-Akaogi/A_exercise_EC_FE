@@ -55,7 +55,7 @@ describe("OrderRepository 顧客JWT認証", () => {
     await repository.findPurchaseHistory();
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "/proxy-api/purchase/history",
+      "/ec-proxy-api/purchase/history",
       expect.any(Object),
     );
     expect(getRequestHeaders(fetchMock)).toEqual({
@@ -84,7 +84,7 @@ describe("OrderRepository 顧客JWT認証", () => {
     await repository.findById("order-uuid");
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "/proxy-api/purchase/history/order-uuid",
+      "/ec-proxy-api/purchase/history/order-uuid",
       expect.any(Object),
     );
     expect(getRequestHeaders(fetchMock).Authorization).toBe(
