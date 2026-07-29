@@ -1,25 +1,21 @@
 import type {
-    CustomerAuthState,
-    CustomerLoginRequest,
+  CustomerAuthState,
+  CustomerLoginRequest,
 } from "@/models/CustomerAuth";
 
 /**
  * UC002・UC008と顧客認証状態を扱うService。
  */
 export interface ICustomerAuthService {
-    login(
-        request: CustomerLoginRequest,
-    ): Promise<CustomerAuthState>;
+  login(request: CustomerLoginRequest): Promise<CustomerAuthState>;
 
-    logout(): Promise<void>;
+  logout(): Promise<void>;
 
-    getAuthState(): CustomerAuthState;
+  getAuthState(): CustomerAuthState;
 
-    getAccessToken(): string | null;
+  getAccessToken(): string | null;
 
-    clearAuthentication(): void;
+  clearAuthentication(): void;
 
-    subscribeToAuthenticationCleared(
-        listener: () => void,
-    ): () => void;
+  subscribeToAuthenticationCleared(listener: () => void): () => void;
 }

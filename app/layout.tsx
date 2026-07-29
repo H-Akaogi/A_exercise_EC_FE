@@ -25,9 +25,7 @@ type RootLayoutProps = {
   children: ReactNode;
 };
 
-export default function RootLayout({
-  children,
-}: RootLayoutProps) {
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ja">
       <body>
@@ -35,9 +33,7 @@ export default function RootLayout({
           <CustomerAuthProvider>
             <Header />
 
-            <main>
-              {children}
-            </main>
+            <main>{children}</main>
           </CustomerAuthProvider>
         </CartProvider>
       </body>

@@ -20,8 +20,8 @@ export interface OrdersDetail {
   count: number;
 
   /**
-     * 購入時価格
-     */
+   * 購入時価格
+   */
   price: number;
 
   /**

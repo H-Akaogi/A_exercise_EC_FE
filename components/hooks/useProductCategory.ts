@@ -1,10 +1,6 @@
 "use client";
 
-import {
-    useCallback,
-    useMemo,
-    useState,
-} from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
@@ -13,60 +9,42 @@ import type { IProductCategoryService } from "@/interfaces/IProductCategoryServi
 import type { ProductCategory } from "@/models/ProductCategory";
 
 export const useProductCategory = () => {
-    const service =
-        useMemo(
-            () =>
-                container.get<IProductCategoryService>(
-                    TYPES.IProductCategoryService,
-                ),
-            [],
-        );
+  const service = useMemo(
+    () => container.get<IProductCategoryService>(TYPES.IProductCategoryService),
+    [],
+  );
 
-    const [
-        categories,
-        setCategories,
-    ] = useState<ProductCategory[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
 
-    const [
-        isLoading,
-        setIsLoading,
-    ] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const [
-        errorMessage,
-        setErrorMessage,
-    ] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-    const findAll =
-        useCallback(
-            async (): Promise<void> => {
-                setIsLoading(true);
-                setErrorMessage("");
+  const findAll = useCallback(async (): Promise<void> => {
+    setIsLoading(true);
+    setErrorMessage("");
 
-                try {
-                    const result =
-                        await service.findAll();
+    try {
+      const result = await service.findAll();
 
-                    setCategories(result);
-                } catch (error) {
-                    setCategories([]);
+      setCategories(result);
+    } catch (error) {
+      setCategories([]);
 
-                    setErrorMessage(
-                        error instanceof Error
-                            ? error.message
-                            : "カテゴリ一覧の取得に失敗しました",
-                    );
-                } finally {
-                    setIsLoading(false);
-                }
-            },
-            [service],
-        );
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "カテゴリ一覧の取得に失敗しました",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [service]);
 
-    return {
-        categories,
-        isLoading,
-        errorMessage,
-        findAll,
-    };
+  return {
+    categories,
+    isLoading,
+    errorMessage,
+    findAll,
+  };
 };

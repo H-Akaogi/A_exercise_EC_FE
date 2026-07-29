@@ -1,7 +1,4 @@
-import {
-    inject,
-    injectable,
-} from "inversify";
+import { inject, injectable } from "inversify";
 
 import { TYPES } from "@/di/types";
 
@@ -10,19 +7,13 @@ import type { IProductCategoryService } from "@/interfaces/IProductCategoryServi
 import type { ProductCategory } from "@/models/ProductCategory";
 
 @injectable()
-export class ProductCategoryService
-    implements IProductCategoryService {
+export class ProductCategoryService implements IProductCategoryService {
+  constructor(
+    @inject(TYPES.IProductCategoryRepository)
+    private readonly repository: IProductCategoryRepository,
+  ) {}
 
-    constructor(
-        @inject(
-            TYPES.IProductCategoryRepository,
-        )
-        private readonly repository: IProductCategoryRepository,
-    ) { }
-
-    public async findAll():
-        Promise<ProductCategory[]> {
-
-        return await this.repository.findAll();
-    }
+  public async findAll(): Promise<ProductCategory[]> {
+    return await this.repository.findAll();
+  }
 }

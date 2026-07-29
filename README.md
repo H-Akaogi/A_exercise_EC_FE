@@ -11,18 +11,18 @@
 
 ### Repository
 
-~~~text
+```text
 CustomerRepository
-~~~
+```
 
 ### 1. 顧客登録フォーム初期情報取得
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                          |
+| -------------- | ----------------------------- |
 | エンドポイント | `GET /proxy-api/account/form` |
-| HTTPメソッド | GET |
-| Repository | CustomerRepository |
-| メソッド | `getForm()` |
+| HTTPメソッド   | GET                           |
+| Repository     | CustomerRepository            |
+| メソッド       | `getForm()`                   |
 
 #### 概要
 
@@ -34,12 +34,12 @@ CustomerRepository
 
 ### 2. アカウント名重複確認
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                                           |
+| -------------- | -------------------------------------------------------------- |
 | エンドポイント | `GET /proxy-api/account/validate/username?username={username}` |
-| HTTPメソッド | GET |
-| Repository | CustomerRepository |
-| メソッド | `existsByAccountName(accountName)` |
+| HTTPメソッド   | GET                                                            |
+| Repository     | CustomerRepository                                             |
+| メソッド       | `existsByAccountName(accountName)`                             |
 
 #### 概要
 
@@ -49,22 +49,22 @@ CustomerRepository
 
 #### レスポンス判定
 
-| ステータス | 処理 |
-| --- | --- |
-| `200 OK` | レスポンスの`exists`を使用する |
-| `409 Conflict` | 登録済みとして`true`を返す |
-| その他 | APIから返されたエラーメッセージを表示する |
+| ステータス     | 処理                                      |
+| -------------- | ----------------------------------------- |
+| `200 OK`       | レスポンスの`exists`を使用する            |
+| `409 Conflict` | 登録済みとして`true`を返す                |
+| その他         | APIから返されたエラーメッセージを表示する |
 
 ---
 
 ### 3. メールアドレス重複確認
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                                                     |
+| -------------- | ------------------------------------------------------------------------ |
 | エンドポイント | `GET /proxy-api/account/validate/mail-address?mailAddress={mailAddress}` |
-| HTTPメソッド | GET |
-| Repository | CustomerRepository |
-| メソッド | `existsByMail(mailAddress)` |
+| HTTPメソッド   | GET                                                                      |
+| Repository     | CustomerRepository                                                       |
+| メソッド       | `existsByMail(mailAddress)`                                              |
 
 #### 概要
 
@@ -74,22 +74,22 @@ CustomerRepository
 
 #### レスポンス判定
 
-| ステータス | 処理 |
-| --- | --- |
-| `200 OK` | レスポンスの`exists`を使用する |
-| `409 Conflict` | 登録済みとして`true`を返す |
-| その他 | APIから返されたエラーメッセージを表示する |
+| ステータス     | 処理                                      |
+| -------------- | ----------------------------------------- |
+| `200 OK`       | レスポンスの`exists`を使用する            |
+| `409 Conflict` | 登録済みとして`true`を返す                |
+| その他         | APIから返されたエラーメッセージを表示する |
 
 ---
 
 ### 4. 顧客アカウント登録
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                               |
+| -------------- | ---------------------------------- |
 | エンドポイント | `POST /proxy-api/account/complete` |
-| HTTPメソッド | POST |
-| Repository | CustomerRepository |
-| メソッド | `create(customer)` |
+| HTTPメソッド   | POST                               |
+| Repository     | CustomerRepository                 |
+| メソッド       | `create(customer)`                 |
 
 #### 概要
 
@@ -99,7 +99,7 @@ CustomerRepository
 
 #### リクエスト項目
 
-~~~text
+```text
 name
 kana
 address1
@@ -108,7 +108,7 @@ phoneNumber
 mailAddress
 username
 password
-~~~
+```
 
 #### 備考
 
@@ -120,21 +120,21 @@ password
 
 ### Repository
 
-~~~text
+```text
 CustomerAuthRepository
 SessionStorageCustomerAuthStore
-~~~
+```
 
 現時点で確認できているコードだけでは、ログインAPIのエンドポイントを確定できません。
 
 `CustomerAuthRepository`の実装を確認後、エンドポイントおよびメソッド名を確定します。
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                       |
+| -------------- | ------------------------------------------ |
 | エンドポイント | `CustomerAuthRepositoryの実装確認後に確定` |
-| HTTPメソッド | POST想定 |
-| Repository | CustomerAuthRepository |
-| メソッド | `login(...)`想定 |
+| HTTPメソッド   | POST想定                                   |
+| Repository     | CustomerAuthRepository                     |
+| メソッド       | `login(...)`想定                           |
 
 ### 概要
 
@@ -148,19 +148,19 @@ SessionStorageCustomerAuthStore
 
 ### Repository
 
-~~~text
+```text
 ProductRepository
 ProductCategoryRepository
-~~~
+```
 
 ### 1. 商品カテゴリ一覧取得
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                      |
+| -------------- | ----------------------------------------- |
 | エンドポイント | `GET /proxy-api/product-category/options` |
-| HTTPメソッド | GET |
-| Repository | ProductCategoryRepository |
-| メソッド | `findAll()` |
+| HTTPメソッド   | GET                                       |
+| Repository     | ProductCategoryRepository                 |
+| メソッド       | `findAll()`                               |
 
 #### 概要
 
@@ -168,21 +168,21 @@ ProductCategoryRepository
 
 APIレスポンスを次の形式へ変換します。
 
-~~~text
+```text
 value → categoryUuid
 label → name
-~~~
+```
 
 ---
 
 ### 2. 全商品取得
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                            |
+| -------------- | ------------------------------- |
 | エンドポイント | `GET /proxy-api/product/search` |
-| HTTPメソッド | GET |
-| Repository | ProductRepository |
-| メソッド | `findByCategory()` |
+| HTTPメソッド   | GET                             |
+| Repository     | ProductRepository               |
+| メソッド       | `findByCategory()`              |
 
 #### 概要
 
@@ -194,12 +194,12 @@ label → name
 
 ### 3. カテゴリ別商品検索
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                                                      |
+| -------------- | ------------------------------------------------------------------------- |
 | エンドポイント | `GET /proxy-api/product/search?productCategoryUuid={productCategoryUuid}` |
-| HTTPメソッド | GET |
-| Repository | ProductRepository |
-| メソッド | `findByCategory(productCategoryUuid)` |
+| HTTPメソッド   | GET                                                                       |
+| Repository     | ProductRepository                                                         |
+| メソッド       | `findByCategory(productCategoryUuid)`                                     |
 
 #### 概要
 
@@ -215,18 +215,18 @@ label → name
 
 ### Repository
 
-~~~text
+```text
 ProductRepository
-~~~
+```
 
 ### 1. 商品詳細取得
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                           |
+| -------------- | ---------------------------------------------- |
 | エンドポイント | `GET /proxy-api/products/detail/{productUuid}` |
-| HTTPメソッド | GET |
-| Repository | ProductRepository |
-| メソッド | `findById(productUuid)` |
+| HTTPメソッド   | GET                                            |
+| Repository     | ProductRepository                              |
+| メソッド       | `findById(productUuid)`                        |
 
 #### 概要
 
@@ -236,10 +236,10 @@ ProductRepository
 
 #### レスポンス判定
 
-| ステータス | 処理 |
-| --- | --- |
-| `200 OK` | 商品詳細を返す |
-| `404 Not Found` | `null`を返す |
+| ステータス      | 処理           |
+| --------------- | -------------- |
+| `200 OK`        | 商品詳細を返す |
+| `404 Not Found` | `null`を返す   |
 
 #### 注意
 
@@ -247,24 +247,22 @@ ProductRepository
 
 将来的には、次のような`response.ok`の判定を追加する方が安全です。
 
-~~~ts
+```ts
 if (!response.ok) {
-    throw new Error(
-        `商品詳細の取得に失敗しました (Status: ${response.status})`,
-    );
+  throw new Error(`商品詳細の取得に失敗しました (Status: ${response.status})`);
 }
-~~~
+```
 
 ---
 
 ### 2. 商品をカートへ追加
 
-| 項目 | 内容 |
-| --- | --- |
-| エンドポイント | 使用しない |
-| HTTPメソッド | なし |
-| Repository | 使用しない |
-| 処理 | フロントエンドのカート状態へ商品と数量を追加する |
+| 項目           | 内容                                             |
+| -------------- | ------------------------------------------------ |
+| エンドポイント | 使用しない                                       |
+| HTTPメソッド   | なし                                             |
+| Repository     | 使用しない                                       |
+| 処理           | フロントエンドのカート状態へ商品と数量を追加する |
 
 #### 概要
 
@@ -282,19 +280,19 @@ if (!response.ok) {
 
 ### Repository
 
-~~~text
+```text
 ProductRepository
 PaymentMethodRepository
-~~~
+```
 
 ### 1. 支払い方法一覧取得
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                    |
+| -------------- | --------------------------------------- |
 | エンドポイント | `GET /proxy-api/payment-method/options` |
-| HTTPメソッド | GET |
-| Repository | PaymentMethodRepository |
-| メソッド | `findAll()` |
+| HTTPメソッド   | GET                                     |
+| Repository     | PaymentMethodRepository                 |
+| メソッド       | `findAll()`                             |
 
 #### 概要
 
@@ -302,21 +300,21 @@ PaymentMethodRepository
 
 APIレスポンスを次の形式へ変換します。
 
-~~~text
+```text
 value → id
 label → name
-~~~
+```
 
 ---
 
 ### 2. 購入確定
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                |
+| -------------- | ----------------------------------- |
 | エンドポイント | `POST /proxy-api/purchase/complete` |
-| HTTPメソッド | POST |
-| Repository | ProductRepository |
-| メソッド | `purchase(paymentMethodId, items)` |
+| HTTPメソッド   | POST                                |
+| Repository     | ProductRepository                   |
+| メソッド       | `purchase(paymentMethodId, items)`  |
 
 #### 概要
 
@@ -326,29 +324,29 @@ label → name
 
 #### リクエスト例
 
-~~~json
+```json
 {
-    "paymentMethodId": 1,
-    "items": [
-        {
-            "productUuid": "product-uuid-001",
-            "quantity": 2
-        },
-        {
-            "productUuid": "product-uuid-002",
-            "quantity": 1
-        }
-    ]
+  "paymentMethodId": 1,
+  "items": [
+    {
+      "productUuid": "product-uuid-001",
+      "quantity": 2
+    },
+    {
+      "productUuid": "product-uuid-002",
+      "quantity": 1
+    }
+  ]
 }
-~~~
+```
 
 #### 認証
 
 アクセストークンが存在する場合、次のヘッダーを付与します。
 
-~~~text
+```text
 Authorization: Bearer {accessToken}
-~~~
+```
 
 アクセストークンがない場合はAPIを呼び出さず、認証情報を削除してログインが必要であることを通知します。
 
@@ -356,20 +354,20 @@ Authorization: Bearer {accessToken}
 
 購入確定API内で、主に次の処理を行います。
 
-~~~text
+```text
 注文情報登録
 注文明細登録
 在庫数減少
-~~~
+```
 
 #### ステータス別処理
 
-| ステータス | 処理 |
-| --- | --- |
-| 200番台 | 購入完了として処理する |
-| `401 Unauthorized` | 認証情報を削除し、再ログインを促す |
-| `404 Not Found` | 商品または支払い方法が存在しない旨を表示する |
-| その他 | APIから返されたエラー内容を表示する |
+| ステータス         | 処理                                         |
+| ------------------ | -------------------------------------------- |
+| 200番台            | 購入完了として処理する                       |
+| `401 Unauthorized` | 認証情報を削除し、再ログインを促す           |
+| `404 Not Found`    | 商品または支払い方法が存在しない旨を表示する |
+| その他             | APIから返されたエラー内容を表示する          |
 
 ---
 
@@ -379,18 +377,18 @@ Authorization: Bearer {accessToken}
 
 ### Repository
 
-~~~text
+```text
 使用しない
-~~~
+```
 
 ### 1. カート内商品の一部を削除
 
-| 項目 | 内容 |
-| --- | --- |
-| エンドポイント | 使用しない |
-| HTTPメソッド | なし |
-| Repository | 使用しない |
-| 処理 | フロントエンドのカート状態から対象商品を削除する |
+| 項目           | 内容                                             |
+| -------------- | ------------------------------------------------ |
+| エンドポイント | 使用しない                                       |
+| HTTPメソッド   | なし                                             |
+| Repository     | 使用しない                                       |
+| 処理           | フロントエンドのカート状態から対象商品を削除する |
 
 #### 概要
 
@@ -402,12 +400,12 @@ Authorization: Bearer {accessToken}
 
 ### 2. カート内商品をすべて削除
 
-| 項目 | 内容 |
-| --- | --- |
-| エンドポイント | 使用しない |
-| HTTPメソッド | なし |
-| Repository | 使用しない |
-| 処理 | フロントエンドのカート状態を空にする |
+| 項目           | 内容                                 |
+| -------------- | ------------------------------------ |
+| エンドポイント | 使用しない                           |
+| HTTPメソッド   | なし                                 |
+| Repository     | 使用しない                           |
+| 処理           | フロントエンドのカート状態を空にする |
 
 #### 概要
 
@@ -421,18 +419,18 @@ Authorization: Bearer {accessToken}
 
 ### Repository
 
-~~~text
+```text
 OrderRepository
-~~~
+```
 
 ### 1. 購入履歴一覧取得
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                              |
+| -------------- | --------------------------------- |
 | エンドポイント | `GET /proxy-api/purchase/history` |
-| HTTPメソッド | GET |
-| Repository | OrderRepository |
-| メソッド | `findPurchaseHistory()` |
+| HTTPメソッド   | GET                               |
+| Repository     | OrderRepository                   |
+| メソッド       | `findPurchaseHistory()`           |
 
 #### 概要
 
@@ -442,38 +440,38 @@ OrderRepository
 
 有効なアクセストークンがある場合、次のヘッダーを付与します。
 
-~~~text
+```text
 Authorization: Bearer {accessToken}
-~~~
+```
 
 #### レスポンス項目
 
-~~~text
+```text
 orderUuid
 orderDate
 orderStatus
 totalPrice
 detailUrl
-~~~
+```
 
 #### ステータス別処理
 
-| ステータス | 処理 |
-| --- | --- |
-| `200 OK` | 購入履歴一覧を表示する |
-| `401 Unauthorized` | 認証情報を削除し、ログインを促す |
-| その他 | APIから返されたエラー内容を表示する |
+| ステータス         | 処理                                |
+| ------------------ | ----------------------------------- |
+| `200 OK`           | 購入履歴一覧を表示する              |
+| `401 Unauthorized` | 認証情報を削除し、ログインを促す    |
+| その他             | APIから返されたエラー内容を表示する |
 
 ---
 
 ### 2. 購入履歴詳細取得
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                          |
+| -------------- | --------------------------------------------- |
 | エンドポイント | `GET /proxy-api/purchase/history/{orderUuid}` |
-| HTTPメソッド | GET |
-| Repository | OrderRepository |
-| メソッド | `findById(orderUuid)` |
+| HTTPメソッド   | GET                                           |
+| Repository     | OrderRepository                               |
+| メソッド       | `findById(orderUuid)`                         |
 
 #### 概要
 
@@ -481,33 +479,33 @@ detailUrl
 
 #### レスポンス項目
 
-~~~text
+```text
 orderUuid
 orderDate
 orderStatusId
 orderStatusName
 orderItems
 totalPrice
-~~~
+```
 
 #### 注文明細項目
 
-~~~text
+```text
 productUuid
 productName
 price
 quantity
 subtotal
-~~~
+```
 
 #### ステータス別処理
 
-| ステータス | 処理 |
-| --- | --- |
-| `200 OK` | 購入履歴詳細を表示する |
-| `401 Unauthorized` | 認証情報を削除し、ログインを促す |
-| `404 Not Found` | 購入履歴が見つからない旨を表示する |
-| その他 | APIから返されたエラー内容を表示する |
+| ステータス         | 処理                                |
+| ------------------ | ----------------------------------- |
+| `200 OK`           | 購入履歴詳細を表示する              |
+| `401 Unauthorized` | 認証情報を削除し、ログインを促す    |
+| `404 Not Found`    | 購入履歴が見つからない旨を表示する  |
+| その他             | APIから返されたエラー内容を表示する |
 
 ---
 
@@ -515,21 +513,21 @@ subtotal
 
 ### Repository
 
-~~~text
+```text
 CustomerAuthRepository
 SessionStorageCustomerAuthStore
-~~~
+```
 
 現時点で確認できているコードだけでは、ログアウトAPIのエンドポイントを確定できません。
 
 `CustomerAuthRepository`の実装を確認後、エンドポイントおよびメソッド名を確定します。
 
-| 項目 | 内容 |
-| --- | --- |
+| 項目           | 内容                                       |
+| -------------- | ------------------------------------------ |
 | エンドポイント | `CustomerAuthRepositoryの実装確認後に確定` |
-| HTTPメソッド | POST想定 |
-| Repository | CustomerAuthRepository |
-| メソッド | `logout()`想定 |
+| HTTPメソッド   | POST想定                                   |
+| Repository     | CustomerAuthRepository                     |
+| メソッド       | `logout()`想定                             |
 
 ### 概要
 
@@ -541,15 +539,15 @@ SessionStorageCustomerAuthStore
 
 # Repository一覧
 
-| Repository | 役割 |
-| --- | --- |
-| CustomerRepository | 顧客アカウント登録、アカウント名・メールアドレス重複確認 |
-| CustomerAuthRepository | 顧客ログイン、ログアウト、認証処理 |
-| SessionStorageCustomerAuthStore | 顧客認証情報およびアクセストークンの保持 |
-| ProductRepository | 商品一覧取得、商品詳細取得、購入確定 |
-| ProductCategoryRepository | 商品カテゴリ一覧取得 |
-| PaymentMethodRepository | 支払い方法一覧取得 |
-| OrderRepository | 購入履歴一覧および購入履歴詳細取得 |
+| Repository                      | 役割                                                     |
+| ------------------------------- | -------------------------------------------------------- |
+| CustomerRepository              | 顧客アカウント登録、アカウント名・メールアドレス重複確認 |
+| CustomerAuthRepository          | 顧客ログイン、ログアウト、認証処理                       |
+| SessionStorageCustomerAuthStore | 顧客認証情報およびアクセストークンの保持                 |
+| ProductRepository               | 商品一覧取得、商品詳細取得、購入確定                     |
+| ProductCategoryRepository       | 商品カテゴリ一覧取得                                     |
+| PaymentMethodRepository         | 支払い方法一覧取得                                       |
+| OrderRepository                 | 購入履歴一覧および購入履歴詳細取得                       |
 
 ---
 
@@ -557,14 +555,14 @@ SessionStorageCustomerAuthStore
 
 次の処理は、バックエンドAPIを呼び出さず、フロントエンドの状態管理で実施します。
 
-| 機能 | 処理 |
-| --- | --- |
-| 商品をカートへ追加 | カート状態へ商品と数量を追加する |
-| カート商品の数量変更 | カート状態の数量を更新する |
-| カート内の一部商品を削除 | 対象商品をカート状態から削除する |
-| カートを空にする | カート状態を初期化する |
-| 購入確認表示 | カート内容を確認モーダルへ表示する |
-| 購入完了表示 | API成功後に完了モーダルを表示する |
+| 機能                     | 処理                               |
+| ------------------------ | ---------------------------------- |
+| 商品をカートへ追加       | カート状態へ商品と数量を追加する   |
+| カート商品の数量変更     | カート状態の数量を更新する         |
+| カート内の一部商品を削除 | 対象商品をカート状態から削除する   |
+| カートを空にする         | カート状態を初期化する             |
+| 購入確認表示             | カート内容を確認モーダルへ表示する |
+| 購入完了表示             | API成功後に完了モーダルを表示する  |
 
 ---
 
@@ -574,7 +572,7 @@ SessionStorageCustomerAuthStore
 
 基本的な処理フローは次のとおりです。
 
-~~~text
+```text
 商品をカートへ追加
 ↓
 カート内容確認
@@ -588,19 +586,19 @@ SessionStorageCustomerAuthStore
 購入完了モーダル表示
 ↓
 カートを空にする
-~~~
+```
 
 購入確認モーダルを表示するだけのAPIは使用しません。
 
 確認対象となる次の情報は、フロントエンドで保持します。
 
-~~~text
+```text
 購入商品
 購入数量
 商品単価
 小計
 合計金額
 支払い方法
-~~~
+```
 
 ---

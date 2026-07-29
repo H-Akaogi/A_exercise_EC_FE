@@ -1,6 +1,5 @@
 import type { PaymentMethod } from "@/models/PaymentMethod";
 
 export interface IPaymentMethodService {
-    findAll():
-        Promise<PaymentMethod[]>;
+  findAll(): Promise<PaymentMethod[]>;
 }

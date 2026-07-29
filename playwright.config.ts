@@ -1,7 +1,4 @@
-import {
-  defineConfig,
-  devices,
-} from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test";
 
 /**
  * 顧客システム Playwright E2Eテスト設定
@@ -26,9 +23,7 @@ export default defineConfig({
   /**
    * CIにtest.onlyが残っていた場合は失敗させる。
    */
-  forbidOnly: Boolean(
-    process.env.CI,
-  ),
+  forbidOnly: Boolean(process.env.CI),
 
   /**
    * 共通Azure DBを更新するテストでは、
@@ -60,22 +55,22 @@ export default defineConfig({
    */
   reporter: process.env.CI
     ? [
-      ["list"],
-      [
-        "html",
-        {
-          open: "never",
-        },
-      ],
-    ]
+        ["list"],
+        [
+          "html",
+          {
+            open: "never",
+          },
+        ],
+      ]
     : [
-      [
-        "html",
-        {
-          open: "always",
-        },
+        [
+          "html",
+          {
+            open: "always",
+          },
+        ],
       ],
-    ],
 
   use: {
     /**
@@ -83,26 +78,22 @@ export default defineConfig({
      * page.goto("/purchase/history")のように、
      * パスだけでアクセスできる。
      */
-    baseURL:
-      "http://127.0.0.1:3000",
+    baseURL: "http://127.0.0.1:3000",
 
     /**
      * 失敗したテストのトレースを保存する。
      */
-    trace:
-      "retain-on-failure",
+    trace: "retain-on-failure",
 
     /**
      * 失敗時の画面を保存する。
      */
-    screenshot:
-      "only-on-failure",
+    screenshot: "only-on-failure",
 
     /**
      * 失敗時の動画を保存する。
      */
-    video:
-      "retain-on-failure",
+    video: "retain-on-failure",
   },
 
   projects: [
@@ -112,8 +103,7 @@ export default defineConfig({
      */
     {
       name: "setup",
-      testMatch:
-        /auth\.setup\.ts/,
+      testMatch: /auth\.setup\.ts/,
     },
 
     /**
@@ -125,15 +115,10 @@ export default defineConfig({
     {
       name: "chromium",
       use: {
-        ...devices[
-        "Desktop Chrome"
-        ],
-        storageState:
-          "e2e/.auth/customer.json",
+        ...devices["Desktop Chrome"],
+        storageState: "e2e/.auth/customer.json",
       },
-      dependencies: [
-        "setup",
-      ],
+      dependencies: ["setup"],
     },
   ],
 
@@ -149,18 +134,12 @@ export default defineConfig({
    * npm run devを使用する。
    */
   webServer: {
-    command:
-      process.env.CI
-        ? "npm run start"
-        : "npm run dev",
+    command: process.env.CI ? "npm run start" : "npm run dev",
 
-    url:
-      "http://127.0.0.1:3000",
+    url: "http://127.0.0.1:3000",
 
-    reuseExistingServer:
-      !process.env.CI,
+    reuseExistingServer: !process.env.CI,
 
-    timeout:
-      120 * 1000,
+    timeout: 120 * 1000,
   },
 });

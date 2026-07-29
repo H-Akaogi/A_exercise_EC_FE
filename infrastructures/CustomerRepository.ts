@@ -10,120 +10,74 @@ import { injectable } from "inversify";
 @injectable()
 export class CustomerRepository implements ICustomerRepository {
   /**
- * 顧客登録フォームの初期情報を取得する
- */
-  public async getForm():
-    Promise<CustomerFormResponse> {
-    const url =
-      "/proxy-api/account/form";
+   * 顧客登録フォームの初期情報を取得する
+   */
+  public async getForm(): Promise<CustomerFormResponse> {
+    const url = "/proxy-api/account/form";
 
-    const response =
-      await fetch(
-        url,
-        {
-          method: "GET",
-          headers: {
-            Accept:
-              "application/json",
-          },
-          credentials:
-            "include",
-          cache:
-            "no-store",
-        },
-      );
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      credentials: "include",
+      cache: "no-store",
+    });
 
     if (!response.ok) {
-      const errorData =
-        await response.json()
-          .catch(
-            () => ({}),
-          ) as {
-            message?: string;
-            detail?: string;
-            title?: string;
-            errors?: Record<
-              string,
-              string[] | string
-            >;
-          };
+      const errorData = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        detail?: string;
+        title?: string;
+        errors?: Record<string, string[] | string>;
+      };
 
-      console.error(
-        "========== API ERROR ==========",
-      );
-      console.error(
-        "getForm url:",
-        url,
-      );
-      console.error(
-        "getForm status:",
-        response.status,
-      );
-      console.error(
-        "getForm error body:",
-        errorData,
-      );
-      console.error(
-        "================================",
-      );
+      console.error("========== API ERROR ==========");
+      console.error("getForm url:", url);
+      console.error("getForm status:", response.status);
+      console.error("getForm error body:", errorData);
+      console.error("================================");
 
       if (errorData.errors) {
-        const messages =
-          Object.values(
-            errorData.errors,
-          )
-            .flat()
-            .join("\n");
+        const messages = Object.values(errorData.errors).flat().join("\n");
 
-        throw new Error(
-          messages,
-        );
+        throw new Error(messages);
       }
 
       throw new Error(
-        errorData.message
-        ?? errorData.detail
-        ?? errorData.title
-        ?? `顧客登録画面の初期情報取得に失敗しました (Status: ${response.status})`,
+        errorData.message ??
+          errorData.detail ??
+          errorData.title ??
+          `顧客登録画面の初期情報取得に失敗しました (Status: ${response.status})`,
       );
     }
 
-    const responseData =
-      await response.json() as {
-        title: string;
-        model: {
-          name: string;
-          kana: string;
-          address1: string;
-          address2: string | null;
-          phoneNumber: string;
-          mailAddress: string;
-          username: string;
-          password: string;
-        };
+    const responseData = (await response.json()) as {
+      title: string;
+      model: {
+        name: string;
+        kana: string;
+        address1: string;
+        address2: string | null;
+        phoneNumber: string;
+        mailAddress: string;
+        username: string;
+        password: string;
       };
+    };
 
     return {
-      title:
-        responseData.title,
+      title: responseData.title,
       model: {
         customerUuid: "",
-        name:
-          responseData.model.name,
-        kana:
-          responseData.model.kana,
-        address1:
-          responseData.model.address1,
-        address2:
-          responseData.model.address2,
-        phoneNumber:
-          responseData.model.phoneNumber,
-        mailAddress:
-          responseData.model.mailAddress,
-        username:
-          responseData.model.username,
-        password:
-          responseData.model.password,
+        name: responseData.model.name,
+        kana: responseData.model.kana,
+        address1: responseData.model.address1,
+        address2: responseData.model.address2,
+        phoneNumber: responseData.model.phoneNumber,
+        mailAddress: responseData.model.mailAddress,
+        username: responseData.model.username,
+        password: responseData.model.password,
         createdAt: "",
       },
     };
@@ -264,9 +218,7 @@ export class CustomerRepository implements ICustomerRepository {
   /**
    * 担当者アカウントを登録する
    */
-  public async create(
-    Customer: Customer,
-  ): Promise<CustomerCompleteResponse> {
+  public async create(Customer: Customer): Promise<CustomerCompleteResponse> {
     const url = "/proxy-api/account/complete";
 
     const requestBody = {

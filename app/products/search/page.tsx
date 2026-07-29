@@ -6,10 +6,10 @@ import { ProductList } from "@/components/purchase/ProductPurchase";
  * URL: /products/search
  */
 export default function ProductPurchasePage() {
-    return (
-        <main className="container mx-auto py-8">
-            {/* 先ほど作成したUIコンポーネントを呼び出す */}
-            <ProductList />
-        </main>
-    );
+  return (
+    <main className="container mx-auto py-8">
+      {/* 先ほど作成したUIコンポーネントを呼び出す */}
+      <ProductList />
+    </main>
+  );
 }

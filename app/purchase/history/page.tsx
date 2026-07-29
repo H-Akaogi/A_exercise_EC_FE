@@ -1,9 +1,5 @@
-import {
-    PurchaseHistory,
-} from "@/components/purchase/PurchaseHistory";
+import { PurchaseHistory } from "@/components/purchase/PurchaseHistory";
 
 export default function PurchaseHistoryPage() {
-    return (
-        <PurchaseHistory />
-    );
+  return <PurchaseHistory />;
 }

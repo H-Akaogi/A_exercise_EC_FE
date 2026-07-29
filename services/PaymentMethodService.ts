@@ -1,7 +1,4 @@
-import {
-    inject,
-    injectable,
-} from "inversify";
+import { inject, injectable } from "inversify";
 
 import { TYPES } from "@/di/types";
 
@@ -10,19 +7,13 @@ import type { IPaymentMethodService } from "@/interfaces/IPaymentMethodService";
 import type { PaymentMethod } from "@/models/PaymentMethod";
 
 @injectable()
-export class PaymentMethodService
-    implements IPaymentMethodService {
+export class PaymentMethodService implements IPaymentMethodService {
+  constructor(
+    @inject(TYPES.IPaymentMethodRepository)
+    private readonly repository: IPaymentMethodRepository,
+  ) {}
 
-    constructor(
-        @inject(
-            TYPES.IPaymentMethodRepository,
-        )
-        private readonly repository: IPaymentMethodRepository,
-    ) { }
-
-    public async findAll():
-        Promise<PaymentMethod[]> {
-
-        return await this.repository.findAll();
-    }
+  public async findAll(): Promise<PaymentMethod[]> {
+    return await this.repository.findAll();
+  }
 }

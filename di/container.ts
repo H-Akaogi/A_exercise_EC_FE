@@ -36,20 +36,49 @@ const container = new Container();
 // バインディング（登録）設定
 // ---------------------------------------------------------
 // リポジトリの登録(モック版を紐付
-container.bind<IProductRepository>(TYPES.IProductRepository).to(ProductRepository).inSingletonScope();
-container.bind<IProductCategoryRepository>(TYPES.IProductCategoryRepository).to(ProductCategoryRepository).inSingletonScope();
-container.bind<IPaymentMethodRepository>(TYPES.IPaymentMethodRepository).to(PaymentMethodRepository).inSingletonScope();
-container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository).inSingletonScope();
-container.bind<ICustomerRepository>(TYPES.ICustomerRepository).to(CustomerRepository).inSingletonScope();
-container.bind<ICustomerAuthRepository>(TYPES.ICustomerAuthRepository).to(CustomerAuthRepository).inSingletonScope();
-container.bind<ICustomerAuthSessionStore>(TYPES.ICustomerAuthSessionStore).to(SessionStorageCustomerAuthStore).inSingletonScope();
+container
+  .bind<IProductRepository>(TYPES.IProductRepository)
+  .to(ProductRepository)
+  .inSingletonScope();
+container
+  .bind<IProductCategoryRepository>(TYPES.IProductCategoryRepository)
+  .to(ProductCategoryRepository)
+  .inSingletonScope();
+container
+  .bind<IPaymentMethodRepository>(TYPES.IPaymentMethodRepository)
+  .to(PaymentMethodRepository)
+  .inSingletonScope();
+container
+  .bind<IOrderRepository>(TYPES.IOrderRepository)
+  .to(OrderRepository)
+  .inSingletonScope();
+container
+  .bind<ICustomerRepository>(TYPES.ICustomerRepository)
+  .to(CustomerRepository)
+  .inSingletonScope();
+container
+  .bind<ICustomerAuthRepository>(TYPES.ICustomerAuthRepository)
+  .to(CustomerAuthRepository)
+  .inSingletonScope();
+container
+  .bind<ICustomerAuthSessionStore>(TYPES.ICustomerAuthSessionStore)
+  .to(SessionStorageCustomerAuthStore)
+  .inSingletonScope();
 // サービス(ユースケース)の
-container.bind<IPurchaseProductService>(TYPES.IPurchaseProductService).to(PurchaseProductService);
-container.bind<IProductCategoryService>(TYPES.IProductCategoryService).to(ProductCategoryService);
-container.bind<IPaymentMethodService>(TYPES.IPaymentMethodService).to(PaymentMethodService);
+container
+  .bind<IPurchaseProductService>(TYPES.IPurchaseProductService)
+  .to(PurchaseProductService);
+container
+  .bind<IProductCategoryService>(TYPES.IProductCategoryService)
+  .to(ProductCategoryService);
+container
+  .bind<IPaymentMethodService>(TYPES.IPaymentMethodService)
+  .to(PaymentMethodService);
 container.bind<IOrderService>(TYPES.IOrderService).to(OrderService);
 container.bind<ICustomerService>(TYPES.ICustomerService).to(CustomerService);
-container.bind<ICustomerAuthService>(TYPES.ICustomerAuthService).to(CustomerAuthService).inSingletonScope();
-
+container
+  .bind<ICustomerAuthService>(TYPES.ICustomerAuthService)
+  .to(CustomerAuthService)
+  .inSingletonScope();
 
 export { container };

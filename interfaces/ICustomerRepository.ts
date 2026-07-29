@@ -22,7 +22,7 @@ export interface ICustomerRepository {
   existsByMail(mail: string): Promise<boolean>;
 
   /**
-  * 顧客登録を完了する
-  */
-  create(customer: Customer,): Promise<CustomerCompleteResponse>;
+   * 顧客登録を完了する
+   */
+  create(customer: Customer): Promise<CustomerCompleteResponse>;
 }
