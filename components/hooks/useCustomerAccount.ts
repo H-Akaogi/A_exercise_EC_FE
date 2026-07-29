@@ -217,6 +217,9 @@ export const useCustomerAccount = () => {
         async (field: CustomerFieldName): Promise<boolean> => {
             let message: string | undefined;
 
+            const namePattern =
+                /^[A-Za-z0-9Ａ-Ｚａ-ｚ０-９ぁ-んァ-ヶ一-龠々ー\s]+$/;
+
             const accountPattern = /^[A-Za-z0-9]+$/;
 
             const kanaPattern = /^[ァ-ヶー\s]+$/;
@@ -231,6 +234,8 @@ export const useCustomerAccount = () => {
                         message = "氏名を入力してください";
                     } else if (customer.name.length < 2 || customer.name.length > 20) {
                         message = "氏名は2〜20文字で入力してください";
+                    } else if (!kanaPattern.test(customer.kana)) {
+                        message = "氏名カナは全角カナで入力してください";
                     }
 
                     break;
