@@ -54,6 +54,7 @@ export const CartPage = () => {
     totalPrice,
     removeCart,
     updateCartQuantity,
+    updateCartProduct,
     clearCart,
   } = useCart();
 
@@ -122,6 +123,48 @@ export const CartPage = () => {
   useEffect(() => {
     void findAllPaymentMethods();
   }, [findAllPaymentMethods]);
+
+  /*
+ * かご画面表示時に、
+ * かご内の商品情報を最新状態へ更新する。
+ */
+  useEffect(() => {
+    const refreshCartProducts =
+      async (): Promise<void> => {
+        if (cartItems.length === 0) {
+          return;
+        }
+
+        try {
+          const latestProducts =
+            await Promise.all(
+              cartItems.map((item) =>
+                purchaseService.findById(
+                  item.product.productUuid,
+                ),
+              ),
+            );
+
+          latestProducts.forEach((product) => {
+            if (product === null) {
+              return;
+            }
+            updateCartProduct(product);
+          });
+        } catch (error) {
+          console.error(
+            "かご内の商品情報の取得に失敗しました",
+            error,
+          );
+
+          setErrorMessage(
+            "最新の商品情報を取得できませんでした",
+          );
+        }
+      };
+
+    void refreshCartProducts();
+  }, [purchaseService, updateCartProduct]);
 
   return (
     <div

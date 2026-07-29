@@ -24,6 +24,9 @@ type CartContextValue = {
   addCart: (product: ProductDetail, quantity: number) => void;
   removeCart: (productUuid: string) => void;
   updateCartQuantity: (productUuid: string, quantity: number) => void;
+  updateCartProduct: (
+    product: ProductDetail,
+  ) => void;
   clearCart: () => void;
 };
 
@@ -192,6 +195,26 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     [cartItems],
   );
 
+  /**
+ * かご内の商品情報を最新情報へ更新する
+ */
+  const updateCartProduct = useCallback(
+    (product: ProductDetail): void => {
+      setCartItems((currentItems) =>
+        currentItems.map((item) =>
+          item.product.productUuid ===
+            product.productUuid
+            ? {
+              ...item,
+              product,
+            }
+            : item,
+        ),
+      );
+    },
+    [],
+  );
+
   const value = useMemo<CartContextValue>(
     () => ({
       cartItems,
@@ -200,6 +223,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       addCart,
       removeCart,
       updateCartQuantity,
+      updateCartProduct,
       clearCart,
     }),
     [
