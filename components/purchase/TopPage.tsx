@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { usePurchaseProduct } from "@/components/hooks/usePurchaseProduct";
-import { useCart } from "@/contexts/CartContext";
 
 /**
  * カルーセルに表示する画像
