@@ -365,7 +365,7 @@ export const ProductDetail = () => {
                                 text-red-700
                             "
             >
-              在庫数分がすでにかごに入っています。
+              売り切れ
             </p>
           )}
 
