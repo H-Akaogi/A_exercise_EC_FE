@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { container } from "@/di/container";
@@ -71,6 +71,14 @@ export const CartPage = () => {
 
   const [errorMessage, setErrorMessage] = useState<string>("");
 
+  type CartItemError = {
+    productUuid: string;
+    message: string;
+  };
+
+  const [cartItemErrors, setCartItemErrors] =
+    useState<CartItemError[]>([]);
+
   /**
    * 購入を確定する
    */
@@ -124,47 +132,77 @@ export const CartPage = () => {
     void findAllPaymentMethods();
   }, [findAllPaymentMethods]);
 
-  /*
- * かご画面表示時に、
- * かご内の商品情報を最新状態へ更新する。
- */
-  useEffect(() => {
-    const refreshCartProducts =
-      async (): Promise<void> => {
-        if (cartItems.length === 0) {
+
+
+  const refreshCartProducts =
+    useCallback(async (): Promise<void> => {
+      if (cartItems.length === 0) {
+        return;
+      }
+
+      const latestProducts =
+        await Promise.all(
+          cartItems.map((item) =>
+            purchaseService.findById(
+              item.product.productUuid,
+            ),
+          ),
+        );
+
+      const errors: CartItemError[] = [];
+
+      latestProducts.forEach((product, index) => {
+        const cartItem = cartItems[index];
+
+        if (product === null) {
+          errors.push({
+            productUuid:
+              cartItem.product.productUuid,
+            message:
+              "商品情報を取得できませんでした",
+          });
+
           return;
         }
 
-        try {
-          const latestProducts =
-            await Promise.all(
-              cartItems.map((item) =>
-                purchaseService.findById(
-                  item.product.productUuid,
-                ),
-              ),
-            );
+        updateCartProduct(product);
 
-          latestProducts.forEach((product) => {
-            if (product === null) {
-              return;
-            }
-            updateCartProduct(product);
+        if (product.stockQuantity <= 0) {
+          errors.push({
+            productUuid: product.productUuid,
+            message: "現在、在庫切れです",
           });
-        } catch (error) {
-          console.error(
-            "かご内の商品情報の取得に失敗しました",
-            error,
-          );
 
-          setErrorMessage(
-            "最新の商品情報を取得できませんでした",
-          );
+          return;
         }
-      };
 
+        if (
+          cartItem.quantity >
+          product.stockQuantity
+        ) {
+          errors.push({
+            productUuid: product.productUuid,
+            message:
+              `現在購入できるのは`
+              + `${product.stockQuantity}個までです`,
+          });
+        }
+      });
+
+      setCartItemErrors(errors);
+    }, [
+      cartItems,
+      purchaseService,
+      updateCartProduct,
+    ]);
+
+  useEffect(() => {
     void refreshCartProducts();
-  }, [purchaseService, updateCartProduct]);
+  }, [refreshCartProducts]);
+
+  const hasOutOfStockItem = cartItemErrors.some(
+    (error) => error.message === "現在、在庫切れです",
+  );
 
   return (
     <div
@@ -248,9 +286,27 @@ export const CartPage = () => {
               {cartItems.map((item) => {
                 const stockQuantity = item.product.stockQuantity;
 
+                const itemError =
+                  cartItemErrors.find(
+                    (error) =>
+                      error.productUuid ===
+                      item.product.productUuid,
+                  );
+
                 return (
-                  <TableRow key={item.product.productUuid}>
-                    <TableCell>{item.product.productName}</TableCell>
+                  <TableRow key={item.product.productUuid}
+                    className={
+                      itemError ? "bg-red-50" : ""
+                    }>
+                    <TableCell>
+                      <p>{item.product.productName}</p>
+
+                      {itemError && (
+                        <p className="mt-1 text-sm font-semibold text-red-700">
+                          {itemError.message}
+                        </p>
+                      )}
+                    </TableCell>
 
                     <TableCell>
                       {item.product.price.toLocaleString()}円
@@ -262,6 +318,7 @@ export const CartPage = () => {
                         min={1}
                         max={stockQuantity}
                         value={item.quantity}
+                        disabled={stockQuantity <= 0}
                         className="
                                                         w-24
                                                     "
@@ -397,7 +454,7 @@ export const CartPage = () => {
                                     flex-1
                                     bg-green-900
                                 "
-                disabled={isLoading || !isAuthenticationInitialized}
+                disabled={isLoading || !isAuthenticationInitialized || hasOutOfStockItem}
                 onClick={() => {
                   if (!isAuthenticated) {
                     router.replace("/login");
